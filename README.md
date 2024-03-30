@@ -1,2 +1,15 @@
 # dotfiles
 Dotfiles
+
+
+## Default Steps/Notes
+
+Mostly a sketchpad of stuff I installed/setup on the clean mac. 
+
+* sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+* homebrew /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+* brew bundle --file Brewfile (See brewfile below)
+* curl -sSL https://install.python-poetry.org | python3 -
+* Add export PATH=$HOME/bin:$HOME/.local/bin:$HOME/local/bin:/usr/local/bin:$PATH to ~/.zshrc
+* git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime
+* sh ~/.vim_runtime/install_awesome_vimrc.sh
