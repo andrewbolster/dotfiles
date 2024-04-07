@@ -17,3 +17,11 @@ Mostly a sketchpad of stuff I installed/setup on the clean mac.
 
 Install Nerd font as your terminal font for icon goodness
 I like the [Jetbrains mono](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip) one
+
+## Apt-Devices (eg RPis)
+
+* ssh-keygen
+* cat ~/.ssh/id_rsa.pub
+* <import to github settings>
+* sudo apt install yadm
+* yadm clone git@github.com:andrewbolster/dotfiles.git
