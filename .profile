@@ -16,12 +16,20 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
+sourceadd() {
+    if [ -d "$1" ]; then
+        source "$1"
+    fi
+}
 
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
+pathadd() {
+    if [ -d "$1" ]; then
+        export PATH="$1:$PATH"
+    fi
+}
+
+pathadd "/opt/homebrew/bin"
+pathadd "$HOME/bin"
+pathadd "$HOME/.local/bin"
+
+sourceadd "$HOME/.cargo/env"
