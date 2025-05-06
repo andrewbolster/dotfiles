@@ -24,7 +24,9 @@ sourceadd() {
 
 pathadd() {
     if [ -d "$1" ]; then
-        export PATH="$1:$PATH"
+        if [[ ":$PATH:" == *"$1:"*  ]]; then
+            export PATH="$1:$PATH"
+        fi
     fi
 }
 
