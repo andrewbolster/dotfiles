@@ -24,7 +24,7 @@ sourceadd() {
 
 pathadd() {
     if [ -d "$1" ]; then
-        if [[ ":$PATH:" == *"$1:"*  ]]; then
+        if [[ ":$PATH:" != *":$1:"*  ]]; then
             export PATH="$1:$PATH"
         fi
     fi
@@ -35,3 +35,5 @@ pathadd "$HOME/bin"
 pathadd "$HOME/.local/bin"
 
 sourceadd "$HOME/.cargo/env"
+
+export PROFILE_SOURCED=1
