@@ -4,6 +4,8 @@
 case $(uname | tr '[:upper:]' '[:lower:]') in
   linux*)
     export OS='linux'
+    sudo apt -y install \
+        fontconfig
     ;;
   darwin*)
     export OS='macosx'
@@ -12,5 +14,4 @@ case $(uname | tr '[:upper:]' '[:lower:]') in
     export OS='unknown'
     ;;
 esac
-
 

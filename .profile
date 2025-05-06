@@ -33,3 +33,4 @@ pathadd "$HOME/bin"
 pathadd "$HOME/.local/bin"
 
 sourceadd "$HOME/.cargo/env"
+. "$HOME/.cargo/env"
