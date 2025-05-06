@@ -30,6 +30,7 @@ pathadd() {
     fi
 }
 
+pathadd "$HOME/.local/share/bob/nvim-bin"
 pathadd "/opt/homebrew/bin"
 pathadd "$HOME/bin"
 pathadd "$HOME/.local/bin"
