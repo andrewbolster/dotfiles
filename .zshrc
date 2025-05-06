@@ -1,6 +1,9 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH=$HOME/bin:$HOME/.local/bin:$HOME/local/bin:/usr/local/bin:$PATH
+if [ -d /opt/homebrew ]
+  export PATH=$PATH:/opt/homebrew/bin
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -120,4 +123,8 @@ eval "$(starship init zsh)"
 
 # Neovim
 alias vim=nvim
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+fi
+
 

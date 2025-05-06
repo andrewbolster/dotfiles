@@ -6,5 +6,7 @@ if ! command -v tailscale &> /dev/null; then
 	echo "Installing Tailscale"
 	curl -fsSL https://tailscale.com/install.sh | sh
 fi
-sudo tailscale up
+if ! command -v tailscale status &> /dev/null; then
+  tailscale up
+fi
 
