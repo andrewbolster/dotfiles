@@ -119,7 +119,9 @@ unset __conda_setup
 eval "$(starship init zsh)"
 
 # Neovim
-alias vim=nvim
+if command -v nvim 2>&1 >/dev/null; then
+  alias vim=nvim
+fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
   alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 fi
