@@ -8,19 +8,6 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-export SHELL=/bin/zsh
-
-sourceadd () {
-  if [ -d "$1" ]; then
-    source "$1"
-  fi
-}
-pathadd () {
-  if [ -d "$1" ]; then
-    PATH="$1:$PATH"
-  fi
-}
-
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
@@ -29,7 +16,12 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-pathadd("$HOME/bin")
-pathadd("$HOME/.local/bin")
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
 
-sourceadd("$HOME/.cargo/env)
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
