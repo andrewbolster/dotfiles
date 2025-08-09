@@ -36,5 +36,4 @@ pathadd "$HOME/bin"
 pathadd "$HOME/.local/bin"
 
 sourceadd "$HOME/.cargo/env"
-
-export PROFILE_SOURCED=1
+_byobu_sourced=1 . /usr/bin/byobu-launch 2>/dev/null || true
