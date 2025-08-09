@@ -1,8 +1,13 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
+<<<<<<< HEAD
 if [ -n $PROFILE_SOURCED ]; then
     source ~/.profile
 fi
+=======
+export PATH=$HOME/bin:$HOME/.local/bin:$HOME/local/bin:/usr/local/bin:$PATH
+
+>>>>>>> 6cba06b (laptop sync)
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -43,7 +48,11 @@ zstyle ':omz:update' mode auto      # update automatically without asking
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
+<<<<<<< HEAD
 # ENABLE_CORRECTION="true"
+=======
+ENABLE_CORRECTION="true"
+>>>>>>> 6cba06b (laptop sync)
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
@@ -102,21 +111,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/bolster/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/bolster/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/bolster/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/bolster/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
+# Starship
 eval "$(starship init zsh)"
 
 # Neovim
@@ -126,3 +121,13 @@ fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
   alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 fi
+
+# RBENV
+eval "$(rbenv init - zsh)"
+
+## GCloud
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "$HOME/src/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/src/google-cloud-sdk/path.zsh.inc"; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "$HOME/src/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/src/google-cloud-sdk/completion.zsh.inc"; fi
