@@ -1,13 +1,10 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
-<<<<<<< HEAD
 if [ -n $PROFILE_SOURCED ]; then
     source ~/.profile
 fi
-=======
 export PATH=$HOME/bin:$HOME/.local/bin:$HOME/local/bin:/usr/local/bin:$PATH
 
->>>>>>> 6cba06b (laptop sync)
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -48,11 +45,7 @@ zstyle ':omz:update' mode auto      # update automatically without asking
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-<<<<<<< HEAD
 # ENABLE_CORRECTION="true"
-=======
-ENABLE_CORRECTION="true"
->>>>>>> 6cba06b (laptop sync)
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
