@@ -1,0 +1,45 @@
+" Personal vim configuration additions
+" Add your custom settings here
+
+" Mouse support for all modes
+set mouse=a
+
+" Line numbers
+set number
+set relativenumber
+
+" Better mouse support in terminal
+if has('mouse')
+    set mouse=a
+    if has('mouse_sgr')
+        set ttymouse=sgr
+    endif
+endif
+
+" Performance improvements for large files
+set synmaxcol=200
+set lazyredraw
+
+" Better search experience
+set ignorecase
+set smartcase
+set hlsearch
+set incsearch
+
+" Modern clipboard support
+if has('clipboard')
+    set clipboard=unnamedplus
+endif
+
+" Better indentation
+set autoindent
+set smartindent
+set expandtab
+set tabstop=4
+set shiftwidth=4
+
+" Visual enhancements
+set cursorline
+set colorcolumn=80
+set scrolloff=8
+set sidescrolloff=8
