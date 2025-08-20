@@ -93,6 +93,17 @@ source $ZSH/oh-my-zsh.sh
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
 
+# Load custom aliases
+# Modern XDG-compliant location
+if [[ -f "$HOME/.config/zsh/aliases.zsh" ]]; then
+    source "$HOME/.config/zsh/aliases.zsh"
+fi
+
+# Load legacy bash aliases for compatibility
+if [[ -f "$HOME/.bash_aliases" ]]; then
+    source "$HOME/.bash_aliases"
+fi
+
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
 # users are encouraged to define aliases within a top-level file in
@@ -106,18 +117,32 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/bolster/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/bolster/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/bolster/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/bolster/google-cloud-sdk/completion.zsh.inc'; fi
-fpath+=/opt/homebrew/share/zsh/site-functions
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
 
-# Smarter completion intialization
+# Add homebrew completions if on macOS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    fpath+=/opt/homebrew/share/zsh/site-functions
+fi
+
+# Smarter completion initialization
 autoload -Uz compinit
-if [ "$(date +'%j')" != "$(stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)" ]; then
-    compinit
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS version with BSD stat
+    if [ "$(date +'%j')" != "$(stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)" ]; then
+        compinit
+    else
+        compinit -C
+    fi
 else
-    compinit -C
+    # Linux version with GNU stat
+    if [ "$(date +'%j')" != "$(stat -c '%Y' ~/.zcompdump 2>/dev/null | date -d @- +'%j' 2>/dev/null)" ]; then
+        compinit
+    else
+        compinit -C
+    fi
 fi
 
 SPACESHIP_PROMPT_ASYNC=true
@@ -142,23 +167,38 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 # >>> mamba initialize >>>
 # !! Contents within this block are managed by 'mamba shell init' !!
-export MAMBA_EXE='/Users/bolster/miniforge3/bin/mamba';
-export MAMBA_ROOT_PREFIX='/Users/bolster/miniforge3';
-__mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__mamba_setup"
+# Platform-agnostic mamba setup
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS paths
+    export MAMBA_EXE="$HOME/miniforge3/bin/mamba"
+    export MAMBA_ROOT_PREFIX="$HOME/miniforge3"
 else
-    alias mamba="$MAMBA_EXE"  # Fallback on help from mamba activate
+    # Linux paths
+    export MAMBA_EXE="$HOME/miniconda3/bin/mamba"
+    export MAMBA_ROOT_PREFIX="$HOME/miniconda3"
 fi
-unset __mamba_setup
+
+if [ -f "$MAMBA_EXE" ]; then
+    __mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__mamba_setup"
+    else
+        alias mamba="$MAMBA_EXE"  # Fallback on help from mamba activate
+    fi
+    unset __mamba_setup
+fi
 # <<< mamba initialize <<<
 
-alias claude="/Users/bolster/.claude/local/claude"
-#zprof
 
 # bun completions
-[ -s "/Users/bolster/.bun/_bun" ] && source "/Users/bolster/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# bob
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+#
+#zprof
+
