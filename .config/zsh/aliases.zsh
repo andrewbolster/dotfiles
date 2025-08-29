@@ -47,10 +47,7 @@ alias tl='tmux list-sessions'
 alias tn='tmux new-session'
 
 # Claude Code shortcuts
-alias claude-config='nvim ~/.claude/settings.json'
-alias claude-local='nvim ~/.claude/settings.local.json'
-alias claude-mcp='~/.claude/start-mcp.sh'
-alias claude-memory='ls -la ~/.claude/memory/'
+alias claude='claude -c --dangerously-skip-permissions'
 alias claude-logs='find ~/.claude -name "*.log" -exec tail -f {} +'
 
 # yadm shortcuts

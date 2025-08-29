@@ -9,14 +9,14 @@ set -e
 echo "🌍 Setting up Claude Code environment integration..."
 
 # Add Claude Code to shell PATH if not already there
-CLAUDE_PATH_EXPORT='export PATH="$HOME/.local/bin:$PATH"'
+CLAUDE_PATH_EXPORT='export PATH="$HOME/.claude/local:$HOME/.local/bin:$PATH"'
 
 # Add to .zshrc if not present
 if ! grep -q "claude" "$HOME/.zshrc" 2>/dev/null; then
     cat >> "$HOME/.zshrc" << 'EOF'
 
 # Claude Code CLI integration
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.claude/local:$HOME/.local/bin:$PATH"
 export CLAUDE_CONFIG_DIR="$HOME/.claude"
 
 # Claude Code aliases and functions
@@ -59,7 +59,7 @@ if [[ -f "$HOME/.bashrc" ]] && ! grep -q "claude" "$HOME/.bashrc" 2>/dev/null; t
     cat >> "$HOME/.bashrc" << 'EOF'
 
 # Claude Code CLI integration
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.claude/local:$HOME/.local/bin:$PATH"
 export CLAUDE_CONFIG_DIR="$HOME/.claude"
 
 # Claude Code aliases
@@ -116,6 +116,57 @@ if command -v claude-code &> /dev/null; then
         mkdir -p "$HOME/.local/share/bash-completion/completions"
         claude-code completion bash > "$HOME/.local/share/bash-completion/completions/claude-code" 2>/dev/null || true
     fi
+fi
+
+# Configure Claude MCP servers if claude command is available
+if command -v claude &> /dev/null; then
+    echo "🔧 Configuring Claude MCP servers..."
+    
+    
+    # Add service-mcp with authentication if token is available
+    if [[ -n "${MCP_STATIC_ACCESS_TOKEN:-}" ]]; then
+        echo "🔑 MCP_STATIC_ACCESS_TOKEN found, configuring authenticated service-mcp..."
+        claude mcp add service-mcp \
+            --transport http \
+            --scope user \
+            --header "Authorization: Bearer ${MCP_STATIC_ACCESS_TOKEN}" \
+            "https://service-mcp-app.nicefield-9cf5f7f2.eastus.azurecontainerapps.io/mcp/" || echo "⚠️  Failed to add service-mcp (may already exist)"
+        echo "✅ service-mcp configured with authentication"
+    else
+        echo "⚠️  MCP_STATIC_ACCESS_TOKEN not found"
+        echo "   To configure service-mcp with authentication, set:"
+        echo "   export MCP_STATIC_ACCESS_TOKEN=<your-token>"
+        echo "   Then re-run: yadm bootstrap"
+        echo ""
+        echo "🔓 Adding development service-mcp without authentication..."
+        claude mcp add service-mcp-dev \
+            --transport http \
+            --scope user \
+            "https://mcp.labs.blackduck.com/mcp/" || echo "⚠️  Failed to add service-mcp-dev (may already exist)"
+        echo "✅ service-mcp-dev configured (no authentication)"
+    fi
+    
+    # Add other MCP servers (these don't require special tokens)
+    echo "📦 Adding standard MCP servers..."
+    
+    # Memory server
+    claude mcp add memory --scope user -- \
+        npx -y @modelcontextprotocol/server-memory || echo "⚠️  Failed to add memory server (may already exist)"
+    
+    # Filesystem server (macOS path)
+    claude mcp add filesystem --scope user -- \
+        npx -y @modelcontextprotocol/server-filesystem /Users/bolster || echo "⚠️  Failed to add filesystem server (may already exist)"
+    
+    # Atlassian server (requires separate ATLASSIAN_* env vars when used)
+    claude mcp add atlassian --scope user -- \
+        npx -y @modelcontextprotocol/server-atlassian || echo "⚠️  Failed to add atlassian server (may already exist)"
+    
+    echo "✅ MCP servers configuration complete"
+    echo "🔍 Run 'claude mcp list' to see configured servers"
+else
+    echo "⚠️  Claude command not found in PATH"
+    echo "   MCP servers will not be auto-configured"
+    echo "   Ensure Claude Code is properly installed and in PATH"
 fi
 
 echo "✅ Claude environment integration complete!"
