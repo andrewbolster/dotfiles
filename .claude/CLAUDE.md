@@ -1,8 +1,95 @@
-# Andrew Bolster's Development Environment Configuration
+# Andrew Bolster's Claude Code Configuration
 
-This document describes the comprehensive development environment and dotfiles configuration for Andrew Bolster's systems.
+This document serves as the main configuration file for Claude Code interactions. For specific agent instructions and detailed context, see the organized agent structure in the `/agents/` directory.
 
-## Configuration Management Strategy
+## Agent Architecture
+
+This configuration uses a hierarchical agent structure:
+
+### Content Agents (`/agents/content/`)
+- **data-science-reports.md**: Weeknotes and blog post creation
+- Specialized for maintaining authentic voice and data accuracy
+
+### Analysis Agents (`/agents/analysis/`)
+- **data-analytics.md**: Black Duck data product analysis
+- Security insights and data-driven decision support
+
+### Operations Agents (`/agents/operations/`)
+- **project-management.md**: JIRA/Confluence management
+- Team coordination and project tracking
+
+### Shared Resources (`/shared/`)
+- **professional-context.md**: Role, team, and organizational context
+- **development-environment.md**: Technical environment details
+- **quality-standards.md**: Data verification and content standards
+
+## Development Environment Summary
+
+For detailed development environment configuration, see `/shared/development-environment.md`.
+
+Key components include:
+- **YADM**: Primary dotfiles management with bootstrap scripts
+- **ZSH**: Modern Oh My Zsh setup with Starship prompt
+- **Neovim**: LazyVim configuration with Claude Code integration
+- **Tmux/Byobu**: Terminal multiplexing with Ctrl-A prefix
+- **Python**: Miniconda3 with multiple environments
+- **Node.js**: Bun package manager integration
+- **Claude Code**: Enhanced MCP server integration
+
+## MCP Server Integration
+
+Available MCP servers and capabilities:
+- **Service-MCP**: Black Duck security data products and analytics
+- **Atlassian**: Confluence/Jira integration (bolster@blackduck.com)
+- **Memory**: Persistent knowledge graph storage
+- **Filesystem**: Local file system operations
+- **DigitalOcean**: Cloud infrastructure management
+
+## Agent Selection Protocol
+
+**IMPORTANT**: When starting any conversation, first determine the task type and automatically load the appropriate agent configuration by reading the relevant files.
+
+### Content Creation Tasks
+**Trigger phrases**: "weeknotes", "blog post", "team update", "monthly report", "content creation"
+
+**Required actions**:
+1. Read `/Users/bolster/.claude/agents/content/data-science-reports.md`
+2. Read `/Users/bolster/.claude/shared/professional-context.md`
+3. Read `/Users/bolster/.claude/shared/quality-standards.md`
+4. Follow the Data Science Content Assistant instructions for authentic voice and data accuracy
+
+### Data Analysis Tasks
+**Trigger phrases**: "data analysis", "query", "analytics", "data products", "security insights", "customer analysis"
+
+**Required actions**:
+1. Read `/Users/bolster/.claude/agents/analysis/data-analytics.md`
+2. Read `/Users/bolster/.claude/shared/professional-context.md`
+3. Use Service-MCP data products for Black Duck security data
+4. Follow data verification hierarchy and quality standards
+
+### Project Management Tasks
+**Trigger phrases**: "JIRA", "project management", "confluence", "documentation", "issue tracking", "team coordination"
+
+**Required actions**:
+1. Read `/Users/bolster/.claude/agents/operations/project-management.md`
+2. Read `/Users/bolster/.claude/shared/professional-context.md`
+3. Use Atlassian MCP for JIRA/Confluence operations
+4. Follow project management standards and workflows
+
+### Development Environment Tasks
+**Trigger phrases**: "development", "configuration", "dotfiles", "environment setup", "technical setup"
+
+**Required actions**:
+1. Read `/Users/bolster/.claude/shared/development-environment.md`
+2. Reference technical configuration details as needed
+3. Use appropriate development tools and standards
+
+### Multi-Domain Tasks
+For tasks spanning multiple domains, load all relevant agent configurations and coordinate between them while maintaining consistency with shared standards.
+
+### Legacy Configuration Details
+
+The following sections contain the original comprehensive development environment configuration for reference:
 
 ### Primary Management: YADM (Yet Another Dotfiles Manager)
 - **Location**: `/usr/bin/yadm`
