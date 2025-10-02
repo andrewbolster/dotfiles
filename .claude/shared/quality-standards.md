@@ -72,3 +72,5 @@
 - **Specify versions** - include exact version numbers and system names
 - **Document assumptions** - make clear what is confirmed vs assumed
 - **Provide context** - explain technical decisions and trade-offs
+- **Verify repository URLs** - check actual repository locations rather than assuming organizational patterns
+- **Link to infrastructure context** - connect to broader platform and data architecture pages
