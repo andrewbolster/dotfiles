@@ -76,6 +76,51 @@ This document contains Andrew Bolster's comprehensive development environment co
 - **Platform-aware initialization**: Different paths for macOS/Linux
 - Multiple conda environments configured
 
+#### Python Development Standards
+- **Preferred**: UV scripts with frontmatter for standalone scripts
+- **Fallback**: Click CLI commands via `uv run` when UV scripts aren't suitable
+- **Rationale**: Modern dependency management with explicit environment isolation
+- **Prohibited**: `sys.path.append()` hacks - use proper package management instead
+
+**Exception Handling:**
+- **Use `logging` module** instead of `print()` statements for errors
+- **Catch specific exceptions** rather than bare `except:`
+- **Include contextual information** in error messages
+- **Use exception chaining** with `raise ... from e` when re-raising
+- **For CLI tools**: Consider Click's `echo()` or Rich library for user-facing output
+
+**UV Script Template:**
+```python
+# /// script
+# dependencies = ["click", "requests"]
+# ///
+
+import logging
+import click
+
+logger = logging.getLogger(__name__)
+
+@click.command()
+def main():
+    """Script description."""
+    try:
+        # Script logic here
+        pass
+    except SpecificError as e:
+        logger.error(f"Operation failed: {e}")
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    main()
+```
+
+**Click CLI via uv run:**
+```bash
+uv run --with click script.py
+```
+
 ### Node.js
 - **Manager**: Bun (modern JavaScript runtime and package manager)
 - Installation: `~/.bun/`

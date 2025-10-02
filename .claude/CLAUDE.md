@@ -6,17 +6,10 @@ This document serves as the main configuration file for Claude Code interactions
 
 This configuration uses a hierarchical agent structure:
 
-### Content Agents (`/agents/content/`)
-- **data-science-reports.md**: Weeknotes and blog post creation
-- Specialized for maintaining authentic voice and data accuracy
-
-### Analysis Agents (`/agents/analysis/`)
-- **data-analytics.md**: Black Duck data product analysis
-- Security insights and data-driven decision support
-
-### Operations Agents (`/agents/operations/`)
-- **project-management.md**: JIRA/Confluence management
-- Team coordination and project tracking
+### Domain Guidelines (`/shared/`)
+- **data-science-reports.md**: Weeknotes and blog post creation guidelines
+- **data-analytics.md**: Black Duck data product analysis workflows
+- **project-management.md**: JIRA/Confluence management processes
 
 ### Shared Resources (`/shared/`)
 - **professional-context.md**: Role, team, and organizational context
@@ -53,7 +46,7 @@ Available MCP servers and capabilities:
 **Trigger phrases**: "weeknotes", "blog post", "team update", "monthly report", "content creation"
 
 **Required actions**:
-1. Read `/Users/bolster/.claude/agents/content/data-science-reports.md`
+1. Read `/Users/bolster/.claude/shared/data-science-reports.md`
 2. Read `/Users/bolster/.claude/shared/professional-context.md`
 3. Read `/Users/bolster/.claude/shared/quality-standards.md`
 4. Follow the Data Science Content Assistant instructions for authentic voice and data accuracy
@@ -62,7 +55,7 @@ Available MCP servers and capabilities:
 **Trigger phrases**: "data analysis", "query", "analytics", "data products", "security insights", "customer analysis"
 
 **Required actions**:
-1. Read `/Users/bolster/.claude/agents/analysis/data-analytics.md`
+1. Read `/Users/bolster/.claude/shared/data-analytics.md`
 2. Read `/Users/bolster/.claude/shared/professional-context.md`
 3. Use Service-MCP data products for Black Duck security data
 4. Follow data verification hierarchy and quality standards
@@ -71,7 +64,7 @@ Available MCP servers and capabilities:
 **Trigger phrases**: "JIRA", "project management", "confluence", "documentation", "issue tracking", "team coordination"
 
 **Required actions**:
-1. Read `/Users/bolster/.claude/agents/operations/project-management.md`
+1. Read `/Users/bolster/.claude/shared/project-management.md`
 2. Read `/Users/bolster/.claude/shared/professional-context.md`
 3. Use Atlassian MCP for JIRA/Confluence operations
 4. Follow project management standards and workflows
