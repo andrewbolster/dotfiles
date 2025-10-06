@@ -38,6 +38,17 @@ Available MCP servers and capabilities:
 - **Filesystem**: Local file system operations
 - **DigitalOcean**: Cloud infrastructure management
 
+## Tool Preferences and Restrictions
+
+**IMPORTANT**: The following tool usage restrictions must be enforced:
+
+### Disallowed Tools
+- **WebSearch**: DO NOT use the built-in WebSearch tool. Use Tavily search tools instead for web research.
+
+### Preferred Alternatives
+- For web search: Use `tavily-search` instead of WebSearch
+- For URL content: Use `tavily-extract` or WebFetch
+
 ## Agent Selection Protocol
 
 **IMPORTANT**: When starting any conversation, first determine the task type and automatically load the appropriate agent configuration by reading the relevant files.
