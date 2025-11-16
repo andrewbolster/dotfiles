@@ -31,12 +31,41 @@ Key components include:
 
 ## MCP Server Integration
 
-Available MCP servers and capabilities:
-- **Service-MCP**: Black Duck security data products and analytics
-- **Atlassian**: Confluence/Jira integration (bolster@blackduck.com)
-- **Memory**: Persistent knowledge graph storage
-- **Filesystem**: Local file system operations
-- **DigitalOcean**: Cloud infrastructure management
+### Global MCP Tools
+Standard MCP tools available in Claude Code installations:
+- **Memory**: Persistent knowledge graph storage (via mcp__memory__ tools)
+  - Stores and retrieves contextual information across sessions
+- **Filesystem**: Local file system operations (via mcp__filesystem__ tools)
+  - File reading, writing, and directory operations
+- **Tavily**: Web search and content extraction (via mcp__tavily__ tools)
+  - **Preferred over built-in WebSearch** for web research
+  - Supports web search, URL extraction, and content crawling
+
+### Custom MCP Tools
+Organization/team-specific MCP servers:
+- **Service-MCP**: Black Duck security data products and analytics (via mcp__service-mcp__ tools)
+  - Access to Black Duck data products for security analysis
+  - Query security findings, customer data, and vulnerability information
+  - Includes data product metadata, SQL query capabilities, and documentation search
+- **Atlassian**: Confluence/Jira integration (via mcp__atlassian__ tools)
+  - Account: bolster@blackduck.com
+  - cloudId for Black Duck: 739838e2-f328-4f14-a533-3f7d49323638
+  - **IMPORTANT**: Atlassian queries often return very large outputs. Use Task/Agent tools to perform searches to avoid context issues.
+  - **IMPORTANT**: When creating new Confluence pages, always include the label 'ai-generated'
+- **Vantage**: Cloud cost management and FinOps analytics
+  - Type: SSE (Server-Sent Events)
+  - URL: https://mcp.vantage.sh/sse
+  - **IMPORTANT**: Vantage cost queries often return very large outputs. Use Task/Agent tools for cost analysis
+
+### Personal MCP Tools
+Individual account-specific tools (not shareable):
+- **Bolster**: Personal HTTP MCP server (via mcp__bolster__ tools)
+  - Type: HTTP
+  - URL: https://mcp.bolster.online/mcp/
+  - Personal development and utility tools
+- **DigitalOcean**: Cloud infrastructure management (via mcp__digitalocean__ tools)
+  - Personal DigitalOcean account integration
+  - Droplet, database, and resource management
 
 ## Tool Preferences and Restrictions
 
