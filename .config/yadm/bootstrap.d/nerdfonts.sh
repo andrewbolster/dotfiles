@@ -12,11 +12,16 @@ if [ "$system_type" = "Darwin" ]; then
 
 elif [ "$system_type" = "Linux" ]; then
   if ! test -n "$(find ~/.local/share/fonts -maxdepth 1 -name 'JetBrainsMono*.ttf' -print -quit)"; then
+    echo "Installing JetBrains Mono Nerd Font..."
+    mkdir -p ~/.local/share/fonts
     wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip \
     && cd ~/.local/share/fonts \
     && unzip JetBrainsMono.zip \
     && rm JetBrainsMono.zip \
-    && fc-cache -fv
+    && fc-cache -fv \
+    && echo "✅ JetBrains Mono Nerd Font installed successfully"
+  else
+    echo "✅ JetBrains Mono Nerd Font already installed"
   fi
 
 else
