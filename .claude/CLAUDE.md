@@ -40,6 +40,7 @@ Standard MCP tools available in Claude Code installations:
 - **Tavily**: Web search and content extraction (via mcp__tavily__ tools)
   - **Preferred over built-in WebSearch** for web research
   - Supports web search, URL extraction, and content crawling
+  - **IMPORTANT**: Tavily searches can return very large outputs. Use Task/Agent tools (subagent_type=Explore or general-purpose) to perform web research to avoid context issues.
 
 ### Custom MCP Tools
 Organization/team-specific MCP servers:
@@ -76,7 +77,8 @@ Individual account-specific tools (not shareable):
 
 ### Preferred Alternatives
 - For web search: Use `tavily-search` instead of WebSearch
-- For URL content: Use `tavily-extract` or WebFetch
+- For public URL content: Use `tavily-extract` or WebFetch
+- For Confluence/Jira content: Use Atlassian MCP tools (NOT Tavily - it cannot access authenticated Atlassian pages)
 
 ## Agent Selection Protocol
 
