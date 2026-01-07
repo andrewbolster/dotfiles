@@ -1,0 +1,41 @@
+#!/bin/bash
+# Claude wrapper script that sets meaningful terminal titles
+
+# Function to set terminal title
+set_title() {
+    printf '\033]0;%s\007' "$1"
+}
+
+# Function to get session name from Claude if possible
+get_session_name() {
+    # Try to extract session name from command args or set a default
+    if [[ "$*" == *"--session-id"* ]]; then
+        # Extract session ID if provided
+        echo "$*" | sed -n 's/.*--session-id[[:space:]]*\([^[:space:]]*\).*/\1/p' | head -c 8
+    elif [[ "$*" == *"Meta Management"* ]] || [[ "$PWD" == *"Meta"* ]]; then
+        echo "Meta Management"
+    else
+        # Use current directory name as fallback
+        basename "$PWD"
+    fi
+}
+
+# Set initial title
+if [[ "$1" == "-r" ]] || [[ "$1" == "--resume" ]]; then
+    if [[ -n "$2" && "$2" != "--"* ]]; then
+        # Resume with specific session name
+        set_title "Claude: $2"
+    else
+        # Resume picker
+        set_title "Claude: Resume Session"
+    fi
+elif [[ "$1" == "-c" ]] || [[ "$1" == "--continue" ]]; then
+    set_title "Claude: Continue"
+else
+    # New session
+    session_hint=$(get_session_name "$*")
+    set_title "Claude: $session_hint"
+fi
+
+# Execute actual Claude command
+exec claude "$@"

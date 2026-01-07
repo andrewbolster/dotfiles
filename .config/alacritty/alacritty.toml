@@ -1,0 +1,11 @@
+
+# Terminal title configuration
+[window]
+dynamic_title = true
+title = "Alacritty"
+
+# Custom key bindings
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\x1b\r"
