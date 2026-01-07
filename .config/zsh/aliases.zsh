@@ -47,7 +47,7 @@ alias tl='tmux list-sessions'
 alias tn='tmux new-session'
 
 # Claude Code shortcuts
-alias claude='claude -c --dangerously-skip-permissions'
+alias claude='claude-titled -r --dangerously-skip-permissions'
 alias claude-logs='find ~/.claude -name "*.log" -exec tail -f {} +'
 
 # yadm shortcuts

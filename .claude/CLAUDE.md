@@ -51,8 +51,14 @@ Organization/team-specific MCP servers:
 - **Atlassian**: Confluence/Jira integration (via mcp__atlassian__ tools)
   - Account: bolster@blackduck.com
   - cloudId for Black Duck: 739838e2-f328-4f14-a533-3f7d49323638
+  - Data Science space ID: 150863953 (key: DS)
   - **IMPORTANT**: Atlassian queries often return very large outputs. Use Task/Agent tools to perform searches to avoid context issues.
   - **IMPORTANT**: When creating new Confluence pages, always include the label 'ai-generated'
+  - **Utility Script**: `/Users/bolster/scratch/query_blogs.py` - Direct Python script for extracting blog content when MCP tools are insufficient
+    - Usage: `python query_blogs.py --help` for options
+    - Bypasses MCP limitations for bulk content extraction from Confluence pages
+    - Outputs clean markdown format for content analysis
+    - Dependencies: atlassian-python-api, click, markdownify
 - **Vantage**: Cloud cost management and FinOps analytics
   - Type: SSE (Server-Sent Events)
   - URL: https://mcp.vantage.sh/sse
