@@ -1,5 +1,6 @@
 #!/bin/bash
 # Claude wrapper script that sets meaningful terminal titles
+# Implements "resume if exists, otherwise create new" behavior
 
 # Function to set terminal title
 set_title() {
@@ -20,22 +21,41 @@ get_session_name() {
     fi
 }
 
-# Set initial title
+# Function to check if conversations exist for current directory
+has_conversations() {
+    # Convert current directory to Claude's internal path format
+    local encoded_path
+    encoded_path=$(echo "$PWD" | sed 's|/|-|g')
+    local claude_project_dir="$HOME/.claude/projects/$encoded_path"
+
+    # Check if project directory exists and has .jsonl files
+    [[ -d "$claude_project_dir" ]] && [[ -n "$(find "$claude_project_dir" -name "*.jsonl" -not -empty 2>/dev/null | head -1)" ]]
+}
+
+# Smart resume logic: resume if conversations exist, otherwise create new
 if [[ "$1" == "-r" ]] || [[ "$1" == "--resume" ]]; then
     if [[ -n "$2" && "$2" != "--"* ]]; then
-        # Resume with specific session name
+        # Resume with specific session name - pass through as-is
         set_title "Claude: $2"
-    else
-        # Resume picker
+        exec claude "$@"
+    elif has_conversations; then
+        # Conversations exist, show resume picker
         set_title "Claude: Resume Session"
+        exec claude "$@"
+    else
+        # No conversations exist, start new session instead
+        session_hint=$(get_session_name "$*")
+        set_title "Claude: $session_hint (New)"
+        # Remove -r flag and pass remaining args
+        shift  # Remove -r
+        exec claude "$@"
     fi
 elif [[ "$1" == "-c" ]] || [[ "$1" == "--continue" ]]; then
     set_title "Claude: Continue"
+    exec claude "$@"
 else
     # New session
     session_hint=$(get_session_name "$*")
     set_title "Claude: $session_hint"
+    exec claude "$@"
 fi
-
-# Execute actual Claude command
-exec claude "$@"
