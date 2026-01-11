@@ -250,3 +250,9 @@ fpath=(/Users/bolster/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
+
+# Claude Code MCP Environment Variables
+# Get your Tavily API key from: https://app.tavily.com/home
+export TAVILY_API_KEY="${TAVILY_API_KEY}"
+
+# Note: Other MCP environment variables like VANTAGE are configured via OAuth in the MCP servers

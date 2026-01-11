@@ -19,6 +19,10 @@ if ! grep -q "claude" "$HOME/.zshrc" 2>/dev/null; then
 export PATH="$HOME/.claude/local:$HOME/.local/bin:$PATH"
 export CLAUDE_CONFIG_DIR="$HOME/.claude"
 
+# Claude Code MCP Environment Variables
+# Get your Tavily API key from: https://app.tavily.com/home
+export TAVILY_API_KEY="${TAVILY_API_KEY}"
+
 # Claude Code aliases and functions
 alias claude-config='nvim ~/.claude/settings.json'
 alias claude-mcp='~/.claude/start-mcp.sh'
@@ -148,18 +152,27 @@ if command -v claude &> /dev/null; then
     
     # Add other MCP servers (these don't require special tokens)
     echo "📦 Adding standard MCP servers..."
-    
+
     # Memory server
     claude mcp add memory --scope user -- \
         npx -y @modelcontextprotocol/server-memory || echo "⚠️  Failed to add memory server (may already exist)"
-    
+
     # Filesystem server (macOS path)
     claude mcp add filesystem --scope user -- \
         npx -y @modelcontextprotocol/server-filesystem /Users/bolster || echo "⚠️  Failed to add filesystem server (may already exist)"
-    
-    # Atlassian server (requires separate ATLASSIAN_* env vars when used)
-    claude mcp add atlassian --scope user -- \
-        npx -y @modelcontextprotocol/server-atlassian || echo "⚠️  Failed to add atlassian server (may already exist)"
+
+    # Tavily web search server (requires TAVILY_API_KEY)
+    claude mcp add tavily --scope user \
+        -e 'TAVILY_API_KEY=${TAVILY_API_KEY}' -- \
+        npx -y @modelcontextprotocol/server-tavily || echo "⚠️  Failed to add tavily server (may already exist)"
+
+    # Vantage cloud cost management server (OAuth authentication)
+    claude mcp add vantage --scope user \
+        --transport sse https://mcp.vantage.sh/sse || echo "⚠️  Failed to add vantage server (may already exist)"
+
+    # Atlassian server (SSE transport)
+    claude mcp add atlassian --scope user \
+        --transport sse https://mcp.atlassian.com/v1/sse || echo "⚠️  Failed to add atlassian server (may already exist)"
     
     echo "✅ MCP servers configuration complete"
     echo "🔍 Run 'claude mcp list' to see configured servers"
