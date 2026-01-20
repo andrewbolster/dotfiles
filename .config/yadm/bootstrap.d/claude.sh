@@ -25,7 +25,7 @@ if [[ ! -f "$HOME/.claude/settings.json" ]]; then
       },
       "filesystem": {
         "command": "npx", 
-        "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/bolster"],
+        "args": ["-y", "@modelcontextprotocol/server-filesystem", "$HOME"],
         "description": "File system operations and project navigation"
       },
       "atlassian": {
@@ -202,9 +202,9 @@ cat > "$HOME/.claude/mcp-global.json" << 'EOF'
     },
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/bolster"],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "$HOME"],
       "env": {
-        "FILESYSTEM_ALLOWED_DIRS": "/home/bolster"
+        "FILESYSTEM_ALLOWED_DIRS": "$HOME"
       }
     },
     "atlassian": {
@@ -312,7 +312,7 @@ This directory contains your Claude Code configuration and data.
 ## MCP Servers Configured
 
 1. **Memory** - Persistent context and memory management
-2. **Filesystem** - File system operations in /home/bolster
+2. **Filesystem** - File system operations in $HOME
 3. **Atlassian** - Jira/Confluence integration (requires credentials)
 4. **Service MCP** - System service management
 
