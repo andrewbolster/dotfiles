@@ -1,0 +1,16 @@
+# Ignore Cisco VPN temporary files
+.cisco/
+
+# Ignore other application logs and caches
+.Trash/
+Library/
+*.log
+
+# Ignore OS-specific files
+.DS_Store
+.localized
+
+# Ignore temporary/cache directories
+.cache/
+*.tmp
+*.temp
