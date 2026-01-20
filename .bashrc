@@ -1,1 +1,0 @@
-/home/bolster/src/configs/dotfiles/.bashrc

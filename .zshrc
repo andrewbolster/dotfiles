@@ -99,10 +99,7 @@ if [[ -f "$HOME/.config/zsh/aliases.zsh" ]]; then
     source "$HOME/.config/zsh/aliases.zsh"
 fi
 
-# Load legacy bash aliases for compatibility
-if [[ -f "$HOME/.bash_aliases" ]]; then
-    source "$HOME/.bash_aliases"
-fi
+# Legacy bash aliases removed - using modern zsh aliases instead
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
@@ -144,20 +141,6 @@ else
         compinit -C
     fi
 fi
-
-SPACESHIP_PROMPT_ASYNC=true
-SPACESHIP_PROMPT_ADD_NEWLINE=true
-SPACESHIP_CHAR_SYMBOL="⚡"
-
-# Only load what you actually use
-SPACESHIP_PROMPT_ORDER=(
-    time
-    user
-    dir
-    git
-    line_sep
-    char
-)
 
 eval "$(starship init zsh)"
 
@@ -247,8 +230,6 @@ fi
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/bolster/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
 # End of Docker CLI completions
 
 # Claude Code MCP Environment Variables
