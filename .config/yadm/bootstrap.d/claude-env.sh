@@ -157,14 +157,20 @@ if command -v claude &> /dev/null; then
     claude mcp add memory --scope user -- \
         npx -y @modelcontextprotocol/server-memory || echo "⚠️  Failed to add memory server (may already exist)"
 
-    # Filesystem server (macOS path)
+    # Filesystem server (platform-agnostic)
     claude mcp add filesystem --scope user -- \
-        npx -y @modelcontextprotocol/server-filesystem /Users/bolster || echo "⚠️  Failed to add filesystem server (may already exist)"
+        npx -y @modelcontextprotocol/server-filesystem "$HOME" || echo "⚠️  Failed to add filesystem server (may already exist)"
 
     # Tavily web search server (requires TAVILY_API_KEY)
-    claude mcp add tavily --scope user \
-        -e 'TAVILY_API_KEY=${TAVILY_API_KEY}' -- \
-        npx -y @modelcontextprotocol/server-tavily || echo "⚠️  Failed to add tavily server (may already exist)"
+    if [[ -n "${TAVILY_API_KEY:-}" ]]; then
+        claude mcp add tavily --scope user \
+            -e "TAVILY_API_KEY=${TAVILY_API_KEY}" -- \
+            npx -y tavily-mcp || echo "⚠️  Failed to add tavily server (may already exist)"
+        echo "✅ tavily configured with API key"
+    else
+        echo "⚠️  TAVILY_API_KEY not set, skipping tavily server"
+        echo "   Set TAVILY_API_KEY in your environment and re-run bootstrap"
+    fi
 
     # Vantage cloud cost management server (OAuth authentication)
     claude mcp add vantage --scope user \
