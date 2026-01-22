@@ -2,6 +2,16 @@
 
 This document contains Andrew Bolster's comprehensive development environment configuration.
 
+## Important Process Management Lessons
+
+### lsof and Port Management
+**To kill only the server listening on a port:**
+```bash
+lsof -ti:3001 -sTCP:LISTEN | xargs kill
+```
+
+**Why not `lsof -ti:3001`?** That returns ALL processes connected to the port (servers AND clients like Firefox), so `kill -9` murders everything including your browser tabs.
+
 ## Configuration Management Strategy
 
 ### Primary Management: YADM (Yet Another Dotfiles Manager)
