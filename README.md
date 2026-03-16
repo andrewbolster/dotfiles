@@ -46,6 +46,13 @@ yadm bootstrap
 - **AI Integration**: Claude Code plugin for in-editor AI assistance
 - **Performance Optimized**: SSH-friendly settings with local enhancements
 
+### ⌨️ **PC-Style Keyboard Support**
+- **Home/End Keys**: Proper line-based navigation (not paragraph-based)
+- **Cross-Application**: Works in native macOS apps via DefaultKeyBinding.dict
+- **Karabiner Integration**: System-wide support including terminal and cross-platform apps
+- **Selection Support**: Shift+Home/End for line-based text selection
+- **UK Apple Extended**: Fully tested with UK Apple Extended keyboards
+
 ### 🔧 **Intelligent Bootstrapping**
 - **Modular Bootstrap**: Individual scripts for different tools and services
 - **Idempotent Operations**: Safe to re-run, preserves existing configurations
@@ -57,12 +64,15 @@ yadm bootstrap
 ```
 ~/
 ├── .config/
+│   ├── karabiner/               # Karabiner-Elements keyboard customization
 │   ├── nvim/                    # Modern Neovim (LazyVim)
 │   ├── tmux/                    # Native tmux configuration
 │   ├── vim/                     # Modern vim configuration
 │   ├── zsh/                     # ZSH aliases and functions
 │   └── yadm/
 │       └── bootstrap.d/         # Modular bootstrap scripts
+├── Library/
+│   └── KeyBindings/             # macOS system-wide key bindings
 ├── .claude/                     # Claude Code AI configuration
 │   ├── CLAUDE.md               # Environment documentation
 │   ├── settings.json           # Global Claude settings
@@ -121,6 +131,13 @@ alias o='open'                  # macOS: open, Linux: xdg-open
 - **Selection**: Double-click words, triple-click lines
 - **Clipboard**: Right-click to paste
 - **Scrolling**: Intelligent wheel scrolling
+
+### **Keyboard Features**
+- **PC-Style Home/End**: Line-based navigation instead of document/paragraph-based
+- **System-Wide**: Works in all applications via Karabiner-Elements
+- **Native App Support**: DefaultKeyBinding.dict for macOS text system apps
+- **Text Selection**: Shift+Home/End for line selection
+- **Terminal Compatible**: Excludes vim/terminal apps where different behavior is expected
 
 ### **AI Permissions**
 ```json
