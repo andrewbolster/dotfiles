@@ -237,3 +237,8 @@ fpath=(/Users/bolster/.docker/completions $fpath)
 export TAVILY_API_KEY="${TAVILY_API_KEY}"
 
 # Note: Other MCP environment variables like VANTAGE are configured via OAuth in the MCP servers
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/bolster/.lmstudio/bin"
+# End of LM Studio CLI section
+
