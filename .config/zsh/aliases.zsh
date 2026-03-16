@@ -75,3 +75,8 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     alias apt-update='sudo apt update && sudo apt upgrade'
     alias o='xdg-open'
 fi
+# Byobu aliases
+alias byo='byobu'
+alias byos='byobu new-session'
+alias byol='byobu list-sessions'
+alias byoa='byobu attach'

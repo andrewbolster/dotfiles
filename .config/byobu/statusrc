@@ -76,3 +76,6 @@
 # Set this to zero to hide seconds int the time display
 # Default 1
 #TIME_SECONDS=0
+
+# Custom status indicators
+tmux_right="$tmux_right git_branch conda_env"
