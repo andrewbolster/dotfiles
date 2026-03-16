@@ -1,0 +1,8 @@
+[user]
+	name = Andrew Bolster
+	email = bolster@blackduck.com
+	signingkey = B6BF4411CD57DFE3
+[commit]
+	gpgsign = true
+[pull]
+	rebase = true
