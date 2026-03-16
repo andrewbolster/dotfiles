@@ -179,7 +179,28 @@ if command -v claude &> /dev/null; then
     # Atlassian server (SSE transport)
     claude mcp add atlassian --scope user \
         --transport sse https://mcp.atlassian.com/v1/sse || echo "⚠️  Failed to add atlassian server (may already exist)"
-    
+
+    # Black Duck MCP server (requires BLACKDUCK_URL and BLACKDUCK_API_TOKEN)
+    if [[ -n "${BLACKDUCK_URL:-}" ]] && [[ -n "${BLACKDUCK_API_TOKEN:-}" ]]; then
+        claude mcp add blackduck --scope user \
+            -e "BLACKDUCK_URL=${BLACKDUCK_URL}" \
+            -e "BLACKDUCK_API_TOKEN=${BLACKDUCK_API_TOKEN}" -- \
+            npx -y @blackduck/mcp-server || echo "⚠️  Failed to add blackduck server (may already exist)"
+        echo "✅ blackduck configured with API token"
+    else
+        echo "⚠️  BLACKDUCK_URL or BLACKDUCK_API_TOKEN not set, skipping blackduck server"
+        echo "   Set BLACKDUCK_URL and BLACKDUCK_API_TOKEN and re-run bootstrap"
+    fi
+
+    # DuckDuckGo Search server (no API key required)
+    claude mcp add ddg-search --scope user -- \
+        npx -y @executeautomation/mcp-ddg-search || echo "⚠️  Failed to add ddg-search server (may already exist)"
+
+    # Bolster personal HTTP MCP server
+    claude mcp add bolster --scope user \
+        --transport http \
+        https://mcp.bolster.online/mcp/ || echo "⚠️  Failed to add bolster server (may already exist)"
+
     echo "✅ MCP servers configuration complete"
     echo "🔍 Run 'claude mcp list' to see configured servers"
 else

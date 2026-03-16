@@ -26,12 +26,13 @@
       "WebSearch"
     ]
   },
-  "model": "claude-sonnet-4",
+  "model": "default-high",
   "hooks": {},
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
+  "alwaysThinkingEnabled": false,
   "autoUpdatesChannel": "stable",
   "skipDangerousModePermissionPrompt": true,
   "verbose": true
