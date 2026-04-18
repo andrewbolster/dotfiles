@@ -1,0 +1,11 @@
+[user]
+	name = Andrew Bolster
+	email = andrew.bolster@gmail.com
+	signingkey = /Users/bolster/.ssh/id_rsa.pub
+[pull]
+	rebase = true
+[color]
+	status = always
+	diff = always
+[gpg]
+	format = ssh

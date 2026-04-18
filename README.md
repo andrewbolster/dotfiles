@@ -20,11 +20,37 @@ yadm bootstrap
 
 ## 🎯 Non-Standard Features & Customizations
 
+### 🏷️ **Multi-Machine Class System**
+
+Dotfiles are split into per-class alternates using [yadm's alternate file system](https://yadm.io/docs/alternates). Three classes are defined:
+
+| Class | Usage | Set with |
+|-------|-------|----------|
+| `Personal` | Personal machines (default) | `yadm config local.class Personal` |
+| `BlackDuck` | Work machines | `yadm config local.class BlackDuck` |
+| `default` | Fallback if no class matches | automatic |
+
+Bootstrap sets `Personal` automatically on new machines. Override before running `yadm bootstrap` on a work machine:
+
+```bash
+yadm config local.class BlackDuck
+yadm alt   # re-link alternates
+```
+
+**Files with class alternates:**
+
+| File | `default` | `Personal` | `BlackDuck` |
+|------|-----------|------------|-------------|
+| `.gitconfig` | name only | gmail, SSH signing | blackduck email, GPG signing |
+| `.claude/settings.json` | `default-high`, inline statusline, ddg-search | ← same as default | `claude-sonnet-4`, external statusline, `DISABLE_*` env vars, work MCPs |
+
+**MCP servers are configured in `settings.json` alternates** (not imperatively via bootstrap), so they are version-controlled and class-aware automatically.
+
 ### 🤖 **AI-First Development**
-- **Claude Code Integration**: Automated MCP server setup with bootstrap scripts
+- **Claude Code Integration**: MCP servers declared in `settings.json` alternates
 - **Enhanced Permissions**: Curated allowlist/denylist for safe AI assistance
 - **Persistent Memory**: MCP memory server for context retention across sessions
-- **Project-Aware**: Filesystem MCP server with proper security boundaries
+- **DuckDuckGo Search**: Privacy-respecting search via `duckduckgo-mcp-server` (uvx, no API key)
 
 ### 🖱️ **Advanced Mouse Integration**
 - **tmux/byobu**: Full mouse support with modern tmux 3.x syntax
@@ -74,9 +100,10 @@ yadm bootstrap
 ├── Library/
 │   └── KeyBindings/             # macOS system-wide key bindings
 ├── .claude/                     # Claude Code AI configuration
-│   ├── CLAUDE.md               # Environment documentation
-│   ├── settings.json           # Global Claude settings
-│   └── settings.local.json     # Local overrides
+│   ├── CLAUDE.md                    # Environment documentation
+│   ├── settings.json##default       # Settings for Personal/unknown machines
+│   ├── settings.json##class.BlackDuck  # Settings for BlackDuck work machines
+│   └── settings.local.json          # Local overrides (not tracked)
 ├── src/configs/dotfiles/        # Legacy configuration symlinks
 └── README.md                    # This file
 ```
