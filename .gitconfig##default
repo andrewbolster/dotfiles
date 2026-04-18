@@ -1,0 +1,7 @@
+[user]
+	name = Andrew Bolster
+[pull]
+	rebase = true
+[color]
+	status = always
+	diff = always
