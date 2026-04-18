@@ -19,6 +19,10 @@ if ! grep -q "claude" "$HOME/.zshrc" 2>/dev/null; then
 export PATH="$HOME/.claude/local:$HOME/.local/bin:$PATH"
 export CLAUDE_CONFIG_DIR="$HOME/.claude"
 
+# Claude Code MCP Environment Variables
+# Get your Tavily API key from: https://app.tavily.com/home
+export TAVILY_API_KEY="${TAVILY_API_KEY}"
+
 # Claude Code aliases and functions
 alias claude-config='nvim ~/.claude/settings.json'
 alias claude-mcp='~/.claude/start-mcp.sh'
@@ -148,19 +152,55 @@ if command -v claude &> /dev/null; then
     
     # Add other MCP servers (these don't require special tokens)
     echo "📦 Adding standard MCP servers..."
-    
+
     # Memory server
     claude mcp add memory --scope user -- \
         npx -y @modelcontextprotocol/server-memory || echo "⚠️  Failed to add memory server (may already exist)"
-    
-    # Filesystem server (macOS path)
+
+    # Filesystem server (platform-agnostic)
     claude mcp add filesystem --scope user -- \
-        npx -y @modelcontextprotocol/server-filesystem /Users/bolster || echo "⚠️  Failed to add filesystem server (may already exist)"
-    
-    # Atlassian server (requires separate ATLASSIAN_* env vars when used)
-    claude mcp add atlassian --scope user -- \
-        npx -y @modelcontextprotocol/server-atlassian || echo "⚠️  Failed to add atlassian server (may already exist)"
-    
+        npx -y @modelcontextprotocol/server-filesystem "$HOME" || echo "⚠️  Failed to add filesystem server (may already exist)"
+
+    # Tavily web search server (requires TAVILY_API_KEY)
+    if [[ -n "${TAVILY_API_KEY:-}" ]]; then
+        claude mcp add tavily --scope user \
+            -e "TAVILY_API_KEY=${TAVILY_API_KEY}" -- \
+            npx -y tavily-mcp || echo "⚠️  Failed to add tavily server (may already exist)"
+        echo "✅ tavily configured with API key"
+    else
+        echo "⚠️  TAVILY_API_KEY not set, skipping tavily server"
+        echo "   Set TAVILY_API_KEY in your environment and re-run bootstrap"
+    fi
+
+    # Vantage cloud cost management server (OAuth authentication)
+    claude mcp add vantage --scope user \
+        --transport sse https://mcp.vantage.sh/sse || echo "⚠️  Failed to add vantage server (may already exist)"
+
+    # Atlassian server (SSE transport)
+    claude mcp add atlassian --scope user \
+        --transport sse https://mcp.atlassian.com/v1/sse || echo "⚠️  Failed to add atlassian server (may already exist)"
+
+    # Black Duck MCP server (requires BLACKDUCK_URL and BLACKDUCK_API_TOKEN)
+    if [[ -n "${BLACKDUCK_URL:-}" ]] && [[ -n "${BLACKDUCK_API_TOKEN:-}" ]]; then
+        claude mcp add blackduck --scope user \
+            -e "BLACKDUCK_URL=${BLACKDUCK_URL}" \
+            -e "BLACKDUCK_API_TOKEN=${BLACKDUCK_API_TOKEN}" -- \
+            npx -y @blackduck/mcp-server || echo "⚠️  Failed to add blackduck server (may already exist)"
+        echo "✅ blackduck configured with API token"
+    else
+        echo "⚠️  BLACKDUCK_URL or BLACKDUCK_API_TOKEN not set, skipping blackduck server"
+        echo "   Set BLACKDUCK_URL and BLACKDUCK_API_TOKEN and re-run bootstrap"
+    fi
+
+    # DuckDuckGo Search server (no API key required)
+    claude mcp add ddg-search --scope user -- \
+        npx -y @executeautomation/mcp-ddg-search || echo "⚠️  Failed to add ddg-search server (may already exist)"
+
+    # Bolster personal HTTP MCP server
+    claude mcp add bolster --scope user \
+        --transport http \
+        https://mcp.bolster.online/mcp/ || echo "⚠️  Failed to add bolster server (may already exist)"
+
     echo "✅ MCP servers configuration complete"
     echo "🔍 Run 'claude mcp list' to see configured servers"
 else
