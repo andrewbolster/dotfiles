@@ -1,7 +1,13 @@
 # Basic Brewfile
-tap "homebrew/bundle"
-tap "homebrew/cask"
-tap "homebrew/core"
+# Note: Most taps are auto-included in modern Homebrew
+
+# Essential system tools
+brew "yadm"
+brew "git"
+brew "starship"
+brew "byobu"
+
+# Development tools
 brew "python@3.11"
 brew "glances"
 brew "gnupg"
@@ -15,9 +21,9 @@ brew "postgresql@14"
 cask "iterm2"
 cask "macfuse"
 cask "clipy"
+cask "claude-code"
 brew "sevenzip"
 brew "neovim"
 brew "tmux"
-cask "homebrew/cask-fonts"
-brew "font-jetbrains-mono-nerd-font"
+cask "font-jetbrains-mono-nerd-font"
 brew "ripgrep"

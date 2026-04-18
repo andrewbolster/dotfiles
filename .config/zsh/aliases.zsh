@@ -47,7 +47,7 @@ alias tl='tmux list-sessions'
 alias tn='tmux new-session'
 
 # Claude Code shortcuts
-alias claude='claude -c --dangerously-skip-permissions'
+alias claude='claude-titled --dangerously-skip-permissions'
 alias claude-logs='find ~/.claude -name "*.log" -exec tail -f {} +'
 
 # yadm shortcuts
@@ -75,3 +75,12 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     alias apt-update='sudo apt update && sudo apt upgrade'
     alias o='xdg-open'
 fi
+
+# Byobu aliases
+alias byo='byobu'
+alias byos='byobu new-session'
+alias byol='byobu list-sessions'
+alias byoa='byobu attach'
+
+# Copilot CLI - load shared Claude instructions as additional context
+export COPILOT_CUSTOM_INSTRUCTIONS_DIRS="$HOME/.claude/shared"
