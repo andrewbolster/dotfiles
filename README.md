@@ -39,10 +39,12 @@ yadm alt   # re-link alternates
 
 **Files with class alternates:**
 
+Each alternate is **fully self-contained** — yadm replaces the file entirely, it does not merge. Each class file must include everything it needs.
+
 | File | `default` | `Personal` | `BlackDuck` |
 |------|-----------|------------|-------------|
-| `.gitconfig` | name only | gmail, SSH signing | blackduck email, GPG signing |
-| `.claude/settings.json` | `default-high`, inline statusline, ddg-search | ← same as default | `claude-sonnet-4`, external statusline, `DISABLE_*` env vars, work MCPs |
+| `.gitconfig` | name only, color, pull.rebase | gmail, SSH signing, color, pull.rebase | blackduck email, GPG signing, color, pull.rebase |
+| `.claude/settings.json` | permissions, personal MCPs (memory/filesystem/ddg-search/bolster), inline statusLine, no model pin | ← same as default | all of default + `env` DISABLE_* block, `claude-sonnet-4-6` model, work MCPs (service-mcp/atlassian/vantage), external `statusline-command.sh`, pptduck plugin |
 
 **MCP servers are configured in `settings.json` alternates** (not imperatively via bootstrap), so they are version-controlled and class-aware automatically.
 
@@ -101,8 +103,8 @@ yadm alt   # re-link alternates
 │   └── KeyBindings/             # macOS system-wide key bindings
 ├── .claude/                     # Claude Code AI configuration
 │   ├── CLAUDE.md                    # Environment documentation
-│   ├── settings.json##default       # Settings for Personal/unknown machines
-│   ├── settings.json##class.BlackDuck  # Settings for BlackDuck work machines
+│   ├── settings.json##default       # Portable baseline (personal MCPs, no model pin)
+│   ├── settings.json##class.BlackDuck  # Work machines (+ work MCPs, model pin, env block)
 │   └── settings.local.json          # Local overrides (not tracked)
 ├── src/configs/dotfiles/        # Legacy configuration symlinks
 └── README.md                    # This file

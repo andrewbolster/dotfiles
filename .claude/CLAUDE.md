@@ -10,11 +10,32 @@ This configuration uses a hierarchical agent structure:
 - **data-science-reports.md**: Weeknotes and blog post creation guidelines
 - **data-analytics.md**: Black Duck data product analysis workflows
 - **project-management.md**: JIRA/Confluence management processes
+- **infrastructure-management.md**: LLM Gateway and infrastructure operations
 
 ### Shared Resources (`/shared/`)
 - **professional-context.md**: Role, team, and organizational context
 - **development-environment.md**: Technical environment details
 - **quality-standards.md**: Data verification and content standards
+
+## Python Script Execution — CRITICAL
+
+**Always use `uv run` to execute Python scripts, never bare `python` or `python3`.**
+
+- Scripts with UV frontmatter (`# /// script` block): run with `uv run <script.py>`
+- Scripts without frontmatter: run with `uv run --with <deps> <script.py>`
+- Never use `python script.py` or `python3 script.py` — these will miss dependencies
+
+**When writing new Python scripts**, always use the UV script format with inline dependency declaration:
+
+```python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["click", "requests"]
+# ///
+```
+
+This applies globally: shell commands, Bash tool calls, command files, and any other context where a Python script is invoked.
 
 ## Development Environment Summary
 
@@ -124,6 +145,15 @@ Individual account-specific tools (not shareable):
 1. Read `/Users/bolster/.claude/shared/development-environment.md`
 2. Reference technical configuration details as needed
 3. Use appropriate development tools and standards
+
+### Infrastructure Management Tasks
+**Trigger phrases**: "llm gateway", "llm.labs", "llm.core", "gateway management", "user onboarding", "budget bump", "model access", "litellm", "infrastructure"
+
+**Required actions**:
+1. Read `/Users/bolster/.claude/shared/infrastructure-management.md`
+2. Read `/Users/bolster/.claude/shared/professional-context.md`
+3. Work from `/Users/bolster/src/service-llm/` using `scripts/manage.py` or `make` targets
+4. Reference Confluence documentation links (do not reproduce content inline)
 
 ### Multi-Domain Tasks
 For tasks spanning multiple domains, load all relevant agent configurations and coordinate between them while maintaining consistency with shared standards.
