@@ -9,8 +9,10 @@ set -e
 
 echo "🌍 Setting up Claude Code environment integration..."
 
-# Add to .zshrc if not present
-if ! grep -q "CLAUDE_CONFIG_DIR" "$HOME/.zshrc" 2>/dev/null; then
+# Add to .zshrc if not present (check .zshrc and aliases.zsh — canonical location is now aliases.zsh)
+_zsh_aliases="$HOME/.config/zsh/aliases.zsh"
+if ! grep -q "CLAUDE_CONFIG_DIR" "$HOME/.zshrc" 2>/dev/null && \
+   ! grep -q "CLAUDE_CONFIG_DIR" "$_zsh_aliases" 2>/dev/null; then
     cat >> "$HOME/.zshrc" << 'EOF'
 
 # Claude Code CLI integration
@@ -20,13 +22,13 @@ export CLAUDE_CONFIG_DIR="$HOME/.claude"
 # Claude Code aliases and functions
 alias claude-config='nvim ~/.claude/settings.json'
 alias claude-memory='ls -la ~/.claude/memory/'
-alias claude-logs='tail -f ~/.claude/logs/*.log 2>/dev/null || echo "No logs found"'
+alias claude-logs='find ~/.claude -name "*.log" -exec tail -f {} +'
 
 claude-backup() {
     local backup_dir="$HOME/.claude/backups/$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$backup_dir"
-    cp -r "$HOME/.claude"/{settings.json,memory} "$backup_dir/" 2>/dev/null
-    echo "📦 Claude settings backed up to: $backup_dir"
+    cp -r "$HOME/.claude"/{settings.json,mcp-global.json,memory,todos} "$backup_dir/" 2>/dev/null
+    echo "Claude settings backed up to: $backup_dir"
 }
 EOF
 fi
