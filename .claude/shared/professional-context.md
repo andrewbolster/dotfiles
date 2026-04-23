@@ -13,7 +13,6 @@
 - **Manager**: Andrew Bolster (@bolster)
 - **Team Members**:
   - Timothy (Tim) Cave
-  - Curtis Wilson
   - Conor Norris
 - **Reports to**: Drew Streib
 
@@ -39,7 +38,6 @@
 - **Capabilities**: Query execution, data product exploration
 
 ### Development Infrastructure
-- **DigitalOcean**: Full account access for droplets, databases, apps
 - **Claude Code**: Enhanced MCP server integration
 - **Memory**: Persistent context storage
 - **Filesystem**: Local file system access
@@ -49,7 +47,6 @@
 2. **Atlassian**: Confluence/Jira integration for documentation and project management
 3. **Memory**: Knowledge graph for persistent context
 4. **Filesystem**: File operations and project management
-5. **DigitalOcean**: Cloud infrastructure management
 
 ## Reporting & Documentation
 ### Content Locations

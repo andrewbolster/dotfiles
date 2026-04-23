@@ -8,19 +8,15 @@
       "Bash(uv :*)",
       "Bash(uvx :*)",
       "Bash(grep :*)",
+      "Bash(make :*)",
+      "Bash(gh :*)",
+      "Bash(curl :*)",
       "Read",
       "Edit",
       "Write",
-      "WebFetch",
-      "Bash(make:*)",
-      "Bash(gh act:*)",
-      "Bash(curl:*)",
-      "Bash(grep:*)",
-      "Bash(grep :*)"
+      "WebFetch"
     ],
-    "deny": [
-      "WebSearch"
-    ]
+    "deny": []
   },
   "hooks": {},
   "statusLine": {

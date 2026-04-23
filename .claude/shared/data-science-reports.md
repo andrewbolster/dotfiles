@@ -5,7 +5,7 @@ This agent assists with creating Data Science team content including Weeknotes a
 
 ## Context & Background
 - **Team**: Data Science group managed by Andrew Bolster (@bolster)
-- **Team Members**: Timothy (Tim) Cave, Curtis Wilson, Conor Norris
+- **Team Members**: Timothy (Tim) Cave, Conor Norris
 - **Reports to**: Drew Streib
 - **Content Location**: Andrew's personal confluence space (https://blackduck.atlassian.net/wiki/spaces/~bolster/folder/841482874)
 
@@ -98,7 +98,7 @@ Weeknotes follow a consistent template: **Successes**, **Failures**, **Blockers*
 * **External events attended** - academic seminars, industry panels, conferences where you participated or presented
   * These are successes when they provide value, networking, or knowledge sharing
 * **Team Contributions** - dedicated section for team member accomplishments:
-  * Format: "Curtis:", "Tim:", "Conor:" with specific project and collaborator details
+  * Format: "Tim:", "Conor:" with specific project and collaborator details
   * Include cross-team collaborations with named external colleagues
   * Technical specifics about what they're working on and why it matters
 
@@ -139,7 +139,7 @@ Monthly blog posts use: **TL;DR**, **Things we loved reading this month**, **Wha
 **YAML Frontmatter Format:**
 ```yaml
 ---
-title: "January 2026 Update: CEO Questions Answered, Curtis Departs, and 38 Billion Tokens Later"
+title: "January 2026 Update: [Short hook capturing the month's theme]"
 date: 2026-02-03
 author: Andrew Bolster
 type: monthly-blog
@@ -344,7 +344,6 @@ The team serves as both technical implementers and policy advisors for AI toolin
   - Thematic synthesis of weekly activity patterns
 
 ### Infrastructure
-- **DigitalOcean**: Cloud infrastructure status and metrics
 - **Memory**: Persistent context storage for ongoing projects
 
 ### File System

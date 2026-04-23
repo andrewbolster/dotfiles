@@ -12,6 +12,22 @@ lsof -ti:3001 -sTCP:LISTEN | xargs kill
 
 **Why not `lsof -ti:3001`?** That returns ALL processes connected to the port (servers AND clients like Firefox), so `kill -9` murders everything including your browser tabs.
 
+## Useful Helper Tools
+
+### markitdown — Convert Office/PDF files to Markdown
+
+Converts Word, Excel, PowerPoint, PDF, and Outlook files to readable Markdown. Useful whenever you need to inspect or extract content from binary document formats.
+
+Always write to a temp file — never pipe to stdout into the conversation, as files can be very large.
+
+```bash
+# Convert to a temp file
+uvx --from 'markitdown[pdf,docx,pptx,xlsx,outlook]' markitdown <filename> --output /tmp/<basename>.md
+
+# Then read incrementally with offset/limit as needed
+# Read /tmp/<basename>.md
+```
+
 ## Configuration Management Strategy
 
 ### Primary Management: YADM (Yet Another Dotfiles Manager)
@@ -20,11 +36,6 @@ lsof -ti:3001 -sTCP:LISTEN | xargs kill
 - **Bootstrap Script**: `~/.config/yadm/bootstrap`
   - Initializes git submodules
   - Executes bootstrap scripts from `~/.config/yadm/bootstrap.d/`
-
-### Legacy Configuration Storage
-- **Primary Location**: `/home/bolster/src/configs/dotfiles/`
-- Contains older dotfiles that are symlinked to home directory
-- Many configurations still reference this location via symlinks
 
 ## Shell Configuration
 
@@ -47,7 +58,7 @@ lsof -ti:3001 -sTCP:LISTEN | xargs kill
 ### Terminal Multiplexer Configuration
 
 #### Byobu (Primary)
-- **Config Directory**: `~/src/configs/dotfiles/.byobu/` (symlinked from `~/.byobu`)
+- **Config Directory**: `~/.config/byobu/`
 - **Backend**: tmux (configured in `backend` file)
 - **Key Features**:
   - Custom status line with network, system info, and time
@@ -75,7 +86,7 @@ lsof -ti:3001 -sTCP:LISTEN | xargs kill
 - **Key Features**:
   - Modern Lua-based configuration
   - LazyVim plugin ecosystem
-  - Recently added: claudecode.nvim plugin for AI assistance
+  - claudecode.nvim plugin for AI assistance
   - Tokyo Night colorscheme with Gruvbox fallback
 
 ## Development Environment
@@ -136,38 +147,8 @@ uv run --with click script.py
 - Installation: `~/.bun/`
 - PATH integration in zsh
 
-### Ruby
-- **Manager**: RVM (Ruby Version Manager)
-- **Alternative**: rbenv (configured in bashrc)
-- PATH integration in both shells
-
 ### Rust
 - **Installation**: Cargo in `~/.cargo/`
 - Environment sourced in bashrc
 
-### Claude Code AI Integration
-- **Bootstrap Configuration**: `~/.config/yadm/bootstrap.d/claude.sh`
-- **Environment Integration**: `~/.config/yadm/bootstrap.d/claude-env.sh`
-- **MCP Servers**: Memory, Filesystem, Atlassian, Service-MCP
-- **Enhanced Permissions**: Safe command allowlist with dangerous command denylist
-- **Shell Integration**: Custom aliases and functions for Claude Code workflow
 
-## System Integration
-
-### Git Configuration
-- **Config**: `~/src/configs/dotfiles/.gitconfig`
-- Additional git runtime config: `~/src/configs/dotfiles/.gitrc`
-
-### SSH Configuration
-- **Directory**: `~/src/configs/dotfiles/.ssh/`
-- Contains SSH keys and configuration
-
-### Package Management
-- **System**: APT package lists in `~/src/configs/pkgs.apt*`
-- **Python**: pip requirements in `~/src/configs/piprequirements.txt`
-- **Conda**: Environment specifications in `~/src/configs/*.conda`
-
-## Known Issues
-1. **Byobu SSH Agent**: Broken symlink to `/tmp/ssh-3dA40FjEnrXt/agent.3702`
-2. **Dual Configuration**: Some tools have both legacy and modern configs
-3. **Platform Differences**: Some zsh configs contain macOS-specific paths
