@@ -6,5 +6,8 @@
 	gpgsign = true
 [pull]
 	rebase = true
+[color]
+	status = always
+	diff = always
 [gpg]
 	program = gpg

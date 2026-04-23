@@ -26,7 +26,15 @@
       "WebSearch"
     ]
   },
-  "model": "claude-sonnet-4",
+  "model": "claude-sonnet-4-6",
+  "hooks": {},
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "alwaysThinkingEnabled": false,
+  "autoUpdatesChannel": "stable",
+  "skipDangerousModePermissionPrompt": true,
   "mcpServers": {
     "memory": {
       "command": "npx",
@@ -63,13 +71,8 @@
       "url": "https://mcp.vantage.sh/sse"
     }
   },
-  "hooks": {},
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
-  },
-  "alwaysThinkingEnabled": false,
-  "autoUpdatesChannel": "stable",
-  "skipDangerousModePermissionPrompt": true,
-  "verbose": true
+  "verbose": true,
+  "enabledPlugins": {
+    "pptduck@agent-powerups": true
+  }
 }
