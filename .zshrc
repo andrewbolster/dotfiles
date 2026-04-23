@@ -186,43 +186,6 @@ export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 #zprof
 
 
-# Claude Code CLI integration
-export PATH="$HOME/.claude/local:$HOME/.local/bin:$PATH"
-export CLAUDE_CONFIG_DIR="$HOME/.claude"
-
-# Claude Code aliases and functions
-alias claude-config='nvim ~/.claude/settings.json'
-alias claude-mcp='~/.claude/start-mcp.sh'
-alias claude-memory='ls -la ~/.claude/memory/'
-alias claude-logs='tail -f ~/.claude/logs/*.log 2>/dev/null || echo "No logs found"'
-
-# Function to quickly start Claude in project mode
-claude-project() {
-    local project_dir=${1:-$(pwd)}
-    echo "🚀 Starting Claude Code in project: $project_dir"
-    cd "$project_dir"
-    claude-code
-}
-
-# Function to backup Claude settings
-claude-backup() {
-    local backup_dir="$HOME/.claude/backups/$(date +%Y%m%d_%H%M%S)"
-    mkdir -p "$backup_dir"
-    cp -r "$HOME/.claude"/{settings.json,mcp-global.json,memory,todos} "$backup_dir/" 2>/dev/null
-    echo "📦 Claude settings backed up to: $backup_dir"
-}
-
-# Function to reset Claude settings to defaults
-claude-reset() {
-    read -p "⚠️  This will reset Claude settings to defaults. Continue? (y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        claude-backup
-        ~/.config/yadm/bootstrap.d/claude.sh
-        echo "🔄 Claude settings reset to defaults"
-    fi
-}
-
 if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
   export PATH=/opt/homebrew/opt/ruby/bin:$PATH
   export PATH=`gem environment gemdir`/bin:$PATH

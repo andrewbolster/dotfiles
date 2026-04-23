@@ -46,9 +46,38 @@ alias ta='tmux attach'
 alias tl='tmux list-sessions'
 alias tn='tmux new-session'
 
-# Claude Code shortcuts
+# Claude Code
+export PATH="$HOME/.claude/local:$HOME/.local/bin:$PATH"
+export CLAUDE_CONFIG_DIR="$HOME/.claude"
+
 alias claude='claude-titled --dangerously-skip-permissions'
+alias claude-config='nvim ~/.claude/settings.json'
+alias claude-mcp='~/.claude/start-mcp.sh'
+alias claude-memory='ls -la ~/.claude/memory/'
 alias claude-logs='find ~/.claude -name "*.log" -exec tail -f {} +'
+
+claude-project() {
+    local project_dir=${1:-$(pwd)}
+    cd "$project_dir"
+    claude
+}
+
+claude-backup() {
+    local backup_dir="$HOME/.claude/backups/$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$backup_dir"
+    cp -r "$HOME/.claude"/{settings.json,mcp-global.json,memory,todos} "$backup_dir/" 2>/dev/null
+    echo "Claude settings backed up to: $backup_dir"
+}
+
+claude-reset() {
+    read -p "This will reset Claude settings to defaults. Continue? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        claude-backup
+        ~/.config/yadm/bootstrap.d/claude.sh
+        echo "Claude settings reset to defaults"
+    fi
+}
 
 # yadm shortcuts
 alias ys='yadm status'
