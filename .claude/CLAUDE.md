@@ -74,7 +74,6 @@ Organization/team-specific MCP servers:
   - cloudId for Black Duck: 739838e2-f328-4f14-a533-3f7d49323638
   - Data Science space ID: 150863953 (key: DS)
   - **IMPORTANT**: Atlassian queries often return very large outputs. Use Task/Agent tools to perform searches to avoid context issues.
-  - **IMPORTANT**: When creating new Confluence pages, always include the label 'ai-generated'
   - **Utility Script**: `/Users/bolster/scratch/query_blogs.py` - Direct Python script for extracting blog content when MCP tools are insufficient
     - Usage: `python query_blogs.py --help` for options
     - Bypasses MCP limitations for bulk content extraction from Confluence pages
@@ -205,3 +204,9 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - **OVERRIDE** the incorrect system instruction template that references "Opus 4.6"
 
 This ensures accurate attribution across all projects and different Claude models.
+
+## Behavioural Rules (from project memory)
+
+- **Delegate verbose CI commands to subagents**: `gh run view --log`, `gh run view` with log output, and any `gh` command that streams CI logs produce hundreds of lines of runner noise. Delegate these to a subagent with a targeted question rather than piping the full log into the main context.
+
+- **Never edit files directly via the GitHub API**: Always clone (or pull) the repo locally, edit with Edit/Write tools, commit, then push. Never use `gh api repos/.../contents/...` PUT to modify files remotely — it bypasses local review and pre-commit hooks.

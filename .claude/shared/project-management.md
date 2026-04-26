@@ -18,6 +18,23 @@ This agent assists with project management tasks including JIRA issue management
 4. **AI Policy**: Governance, compliance, market communications
 5. **MCP Development**: Model Context Protocol integrations
 
+## Issue Triage Workflow
+
+When a bug, limitation, or operational concern is raised (typically via a Teams discussion thread), follow this pattern:
+
+1. **Identify the origin** — find the Teams message thread URL and include it as a comment on the Jira ticket for traceability
+2. **Research and justify** — assess the upstream issue (e.g. LiteLLM GitHub issue), current state of the codebase (version pinned, config present/absent), and determine why it is relevant but not immediate (e.g. waiting for a stable release, no current user impact)
+3. **Raise a DS Jira ticket** — document the problem, the fix required, deployment strategy, and known operational impacts
+4. **Raise a repo-specific GitHub issue** — include the concrete changes needed (diffs, YAML snippets), reference the Jira ticket (`Tracks: DS-XXXX`), and mirror the key context so engineers can act on it without needing Jira access
+5. **Cross-link** — add a comment on the Jira ticket pointing to the GitHub issue URL, so both systems are navigable from either direction
+
+### Priority justification pattern
+
+When the fix is known but deployment should be deferred, document explicitly:
+- Why it is not urgent (no current user impact, upstream fix not yet stable, etc.)
+- What the trigger condition is for actioning it (e.g. "upgrade to next stable release after X")
+- Any operational risks to be validated before rollout
+
 ## JIRA Management
 
 ### Issue Creation Standards
