@@ -28,21 +28,35 @@
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
+  "enabledPlugins": {
+    "pptduck@agent-powerups": true,
+    "data-science@bd-vitalstatistix-marketplace": true,
+    "bolster@bd-vitalstatistix-marketplace": true
+  },
   "alwaysThinkingEnabled": false,
   "autoUpdatesChannel": "stable",
   "skipDangerousModePermissionPrompt": true,
   "mcpServers": {
     "memory": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
     },
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "%HOME%"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "%HOME%"
+      ]
     },
     "ddg-search": {
       "command": "uvx",
-      "args": ["duckduckgo-mcp-server"],
+      "args": [
+        "duckduckgo-mcp-server"
+      ],
       "env": {
         "DDG_SAFE_SEARCH": "OFF"
       }
@@ -59,16 +73,13 @@
       }
     },
     "atlassian": {
-      "type": "sse",
-      "url": "https://mcp.atlassian.com/v1/sse"
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v1/mcp"
     },
     "vantage": {
       "type": "sse",
       "url": "https://mcp.vantage.sh/sse"
     }
   },
-  "verbose": true,
-  "enabledPlugins": {
-    "pptduck@agent-powerups": true
-  }
+  "verbose": true
 }
