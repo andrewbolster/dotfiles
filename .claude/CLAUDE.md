@@ -95,6 +95,14 @@ Individual account-specific tools (not shareable):
   - Personal DigitalOcean account integration
   - Droplet, database, and resource management
 
+## Waiting on Long-Running Tasks (CI, builds, deploys)
+
+Use the `schedule` skill to poll rather than sleeping or repeatedly checking manually.
+
+**Pattern**: check at 1 min, 2 min, 3 min, 4 min, 5 min, then every 5 min until 30 min total, then stop.
+
+When a check comes back complete (pass or fail), cancel remaining scheduled checks and act on the result immediately.
+
 ## Tool Preferences and Restrictions
 
 **IMPORTANT**: The following tool usage restrictions must be enforced:
