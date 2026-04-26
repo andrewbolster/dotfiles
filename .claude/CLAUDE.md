@@ -97,11 +97,11 @@ Individual account-specific tools (not shareable):
 
 ## Waiting on Long-Running Tasks (CI, builds, deploys)
 
-Use the `schedule` skill to poll rather than sleeping or repeatedly checking manually.
+Use `ScheduleWakeup` to poll rather than sleeping or repeatedly checking manually. The `/schedule` skill is for recurring remote cloud agents and cannot access local tools like `gh`.
 
 **Pattern**: check at 1 min, 2 min, 3 min, 4 min, 5 min, then every 5 min until 30 min total, then stop.
 
-When a check comes back complete (pass or fail), cancel remaining scheduled checks and act on the result immediately.
+When a check comes back complete (pass or fail), act on the result immediately — no need to schedule further checks.
 
 ## Tool Preferences and Restrictions
 
