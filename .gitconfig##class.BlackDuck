@@ -11,3 +11,9 @@
 	diff = always
 [gpg]
 	program = gpg
+
+[includeIf "hasconfig:remote.*.url:git@github.com:bd-internal/**"]
+	path = ~/.gitconfig-bolster_quack
+
+[includeIf "hasconfig:remote.*.url:https://github.com/bd-internal/**"]
+	path = ~/.gitconfig-bolster_quack
