@@ -1,5 +1,3 @@
-registry=https://artifactory.tools.duckutil.net:443/artifactory/api/npm/npmjs/
-//artifactory.tools.duckutil.net:443/artifactory/api/npm/npmjs/:_password=REMOVED
-//artifactory.tools.duckutil.net:443/artifactory/api/npm/npmjs/:username=bolster
-//artifactory.tools.duckutil.net:443/artifactory/api/npm/npmjs/:email=bolster@blackduck.com
-//artifactory.tools.duckutil.net:443/artifactory/api/npm/npmjs/:always-auth=true
+registry=https://artifactory.tools.duckutil.net:443/artifactory/api/npm/npm-virtual/
+//artifactory.tools.duckutil.net:443/artifactory/api/npm/npm-virtual/:_authToken=${ARTIFACTORY_TOKEN}
+//artifactory.tools.duckutil.net:443/artifactory/api/npm/npm-virtual/:always-auth=true
