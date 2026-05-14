@@ -3,3 +3,5 @@
 	email = bolster@blackduck.com
 [github]
 	user = bolster_quack
+[url "git@github-bolster_quack:bd-internal/"]
+	insteadOf = git@github.com:bd-internal/

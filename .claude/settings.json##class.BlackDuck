@@ -18,7 +18,13 @@
       "Read",
       "Edit",
       "Write",
-      "WebFetch"
+      "WebFetch",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(cat)",
+      "Bash(uv run *)",
+      "Bash(python3 -c \"import sys; data=sys.stdin.read\\(\\); print\\(repr\\(data\\)\\)\")"
     ],
     "deny": []
   },
@@ -30,12 +36,21 @@
   },
   "enabledPlugins": {
     "pptduck@agent-powerups": true,
-    "data-science@bd-vitalstatistix-marketplace": true,
-    "bolster@bd-vitalstatistix-marketplace": true
+    "superduck@bd-internal-claude-marketplace": true,
+    "polaris@bd-internal-claude-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "bd-internal-claude-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "bd-internal/claude-marketplace"
+      }
+    }
   },
   "alwaysThinkingEnabled": false,
   "autoUpdatesChannel": "stable",
   "skipDangerousModePermissionPrompt": true,
+  "verbose": true,
   "mcpServers": {
     "memory": {
       "command": "npx",
@@ -80,6 +95,5 @@
       "type": "sse",
       "url": "https://mcp.vantage.sh/sse"
     }
-  },
-  "verbose": true
+  }
 }

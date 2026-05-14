@@ -210,3 +210,5 @@ This ensures accurate attribution across all projects and different Claude model
 - **Delegate verbose CI commands to subagents**: `gh run view --log`, `gh run view` with log output, and any `gh` command that streams CI logs produce hundreds of lines of runner noise. Delegate these to a subagent with a targeted question rather than piping the full log into the main context.
 
 - **Never edit files directly via the GitHub API**: Always clone (or pull) the repo locally, edit with Edit/Write tools, commit, then push. Never use `gh api repos/.../contents/...` PUT to modify files remotely — it bypasses local review and pre-commit hooks.
+
+- **Never use `gh pr merge --admin`**: This bypasses branch protection rules and required status checks. It must never be used, even when CI failures appear to be environmental/flaky rather than code-related. The correct approach is to investigate and fix the root cause, retry the failing jobs, or explicitly ask the user to decide whether to override. The user's repo rules exist for a reason.
