@@ -5,4 +5,6 @@ url = "https://artifactory.tools.duckutil.net:443/artifactory/api/pypi/pypi/simp
 default = true
 
 [[index]]
+name = "pypi"
 url = "https://pypi.org/simple/"
+explicit = true
