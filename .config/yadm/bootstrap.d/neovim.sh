@@ -21,15 +21,14 @@ if ! command -v nvim 2>&1 /dev/null; then
 fi
 
 # Install tree-sitter-cli (required by nvim-treesitter)
+# macOS: handled by Brewfile (brew "tree-sitter")
 if ! command -v tree-sitter 2>&1 /dev/null; then
-    if [ "$system_type" = "Darwin" ]; then
-        brew install tree-sitter
-    elif [ "$system_type" = "Linux" ]; then
+    if [ "$system_type" = "Linux" ]; then
         if ! command -v cargo 2>&1 /dev/null; then
             curl https://sh.rustup.rs -sSf | sh -s -- -y
         fi
         ~/.cargo/bin/cargo install tree-sitter-cli
-    else
+    elif [ "$system_type" != "Darwin" ]; then
         echo "No installation target for $system_type for tree-sitter-cli"
     fi
 fi
