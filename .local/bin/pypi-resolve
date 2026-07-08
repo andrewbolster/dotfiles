@@ -1,0 +1,190 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["click", "requests", "packaging"]
+# ///
+"""
+Resolve full transitive dependency tree for a list of PyPI packages.
+Outputs package==version lines suitable for a requirements lock file.
+"""
+
+import sys
+from graphlib import TopologicalSorter
+from packaging.requirements import Requirement
+from packaging.version import Version
+from packaging.specifiers import SpecifierSet
+import click
+import requests
+
+PYPI_URL = "https://pypi.org/pypi/{package}/json"
+PYPI_VERSION_URL = "https://pypi.org/pypi/{package}/{version}/json"
+
+_cache: dict = {}
+
+
+def fetch_package_info(package: str, version: str | None = None) -> dict | None:
+    key = f"{package}=={version}" if version else package
+    if key in _cache:
+        return _cache[key]
+    url = PYPI_VERSION_URL.format(package=package, version=version) if version else PYPI_URL.format(package=package)
+    try:
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+        _cache[key] = data
+        return data
+    except requests.HTTPError as e:
+        click.echo(f"  warning: could not fetch {key}: {e}", err=True)
+        return None
+
+
+def resolve_version(package: str, specifier_str: str = "") -> str | None:
+    """Pick the latest version of package satisfying specifier_str."""
+    data = fetch_package_info(package)
+    if not data:
+        return None
+    spec = SpecifierSet(specifier_str)
+    releases = data.get("releases", {})
+    candidates = sorted(
+        (Version(v) for v in releases if not Version(v).is_prerelease),
+        reverse=True,
+    )
+    for v in candidates:
+        if v in spec:
+            return str(v)
+    # If nothing matches the spec, fall back to latest
+    if candidates:
+        return str(candidates[0])
+    return None
+
+
+def get_requires_dist(package: str, version: str) -> list[str]:
+    """Return requires_dist for a specific package version, excluding extras and env markers that don't apply."""
+    data = fetch_package_info(package, version)
+    if not data:
+        return []
+    info = data.get("info", {})
+    requires = info.get("requires_dist") or []
+    result = []
+    for req_str in requires:
+        req = Requirement(req_str)
+        # Skip optional/extra deps
+        if req.extras:
+            continue
+        # Skip deps with markers that won't apply to a generic Python 3.11+ env
+        if req.marker:
+            try:
+                if not req.marker.evaluate({"extra": "", "python_version": "3.11"}):
+                    continue
+            except Exception:
+                pass
+        result.append(req_str)
+    return result
+
+
+def build_graph(
+    roots: list[tuple[str, str]],
+    verbose: bool,
+) -> tuple[dict[str, str], dict[str, set[str]]]:
+    """
+    BFS over the dependency graph.
+    Returns:
+      resolved: {normalised_name: version}
+      graph:    {normalised_name: {dep_name, ...}}
+    """
+    def norm(name: str) -> str:
+        return name.lower().replace("_", "-")
+
+    resolved: dict[str, str] = {}
+    graph: dict[str, set[str]] = {}
+    queue: list[tuple[str, str]] = []
+
+    for name, spec in roots:
+        n = norm(name)
+        ver = resolve_version(name, spec)
+        if ver is None:
+            click.echo(f"  error: could not resolve {name}{spec}", err=True)
+            continue
+        if verbose:
+            click.echo(f"  root  {n}=={ver}", err=True)
+        resolved[n] = ver
+        queue.append((n, ver))
+
+    while queue:
+        pkg, ver = queue.pop(0)
+        deps_raw = get_requires_dist(pkg, ver)
+        graph.setdefault(pkg, set())
+        for dep_str in deps_raw:
+            req = Requirement(dep_str)
+            dep = norm(req.name)
+            graph[pkg].add(dep)
+            if dep in resolved:
+                continue
+            dep_ver = resolve_version(req.name, str(req.specifier))
+            if dep_ver is None:
+                click.echo(f"  warning: could not resolve dep {dep} (required by {pkg})", err=True)
+                continue
+            if verbose:
+                click.echo(f"  dep   {dep}=={dep_ver}  (from {pkg})", err=True)
+            resolved[dep] = dep_ver
+            graph.setdefault(dep, set())
+            queue.append((dep, dep_ver))
+
+    return resolved, graph
+
+
+def topological_sort(resolved: dict[str, str], graph: dict[str, set[str]]) -> list[str]:
+    """Return packages in install order (dependencies before dependents)."""
+    # Restrict graph edges to packages we actually resolved
+    clean_graph = {
+        pkg: {dep for dep in deps if dep in resolved}
+        for pkg, deps in graph.items()
+        if pkg in resolved
+    }
+    # Add any resolved packages with no recorded edges
+    for pkg in resolved:
+        clean_graph.setdefault(pkg, set())
+
+    ts = TopologicalSorter(clean_graph)
+    return list(ts.static_order())
+
+
+@click.command()
+@click.argument("packages", nargs=-1, required=True)
+@click.option("--verbose", "-v", is_flag=True, help="Show resolution progress on stderr")
+@click.option("--output", "-o", type=click.Path(), default=None, help="Write output to file instead of stdout")
+def main(packages: tuple[str, ...], verbose: bool, output: str | None):
+    """
+    Resolve the full transitive dependency tree for PACKAGES and print
+    a sorted package==version list.
+
+    PACKAGES may be bare names (requests) or pinned/constrained
+    (requests>=2.28, 'numpy==1.26.0').
+
+    Example:
+        pypi-resolve prophet
+        pypi-resolve 'fastapi>=0.100' pydantic uvicorn
+    """
+    roots: list[tuple[str, str]] = []
+    for p in packages:
+        req = Requirement(p)
+        roots.append((req.name, str(req.specifier)))
+
+    click.echo(f"Resolving {len(roots)} root package(s)...", err=True)
+    resolved, graph = build_graph(roots, verbose)
+    click.echo(f"Resolved {len(resolved)} packages total.", err=True)
+
+    ordered = topological_sort(resolved, graph)
+    lines = [f"{pkg}=={resolved[pkg]}" for pkg in ordered if pkg in resolved]
+
+    out = "\n".join(lines) + "\n"
+    if output:
+        with open(output, "w") as f:
+            f.write(out)
+        click.echo(f"Written to {output}", err=True)
+    else:
+        click.echo(out, nl=False)
+
+
+if __name__ == "__main__":
+    main()
