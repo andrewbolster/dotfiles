@@ -1,7 +1,7 @@
 native-tls = true
 
 [[index]]
-url = "https://artifactory.tools.duckutil.net:443/artifactory/api/pypi/pypi/simple/"
+url = "https://artifactory.tools.duckutil.net:443/artifactory/api/pypi/pypi-virtual/simple/"
 default = true
 
 [[index]]

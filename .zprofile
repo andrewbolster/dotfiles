@@ -12,3 +12,6 @@ _byobu_sourced=1 . /usr/bin/byobu-launch 2>/dev/null || true
 # Added by Toolbox App
 export PATH="$PATH:/Users/bolster/Library/Application Support/JetBrains/Toolbox/scripts"
 
+# Add llama app CLI
+export PATH="$PATH:$HOME/.llama-app"
+

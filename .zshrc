@@ -1,6 +1,5 @@
-#zmodload zsh/zprof
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:$PATH
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -10,7 +9,6 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
-#ZSH_THEME="spaceship"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -34,7 +32,7 @@ ZSH_THEME="robbyrussell"
 # zstyle ':omz:update' frequency 13
 
 # Uncomment the following line if pasting URLs and other text is messed up.
-DISABLE_MAGIC_FUNCTIONS="true"
+# DISABLE_MAGIC_FUNCTIONS="true"
 
 # Uncomment the following line to disable colors in ls.
 # DISABLE_LS_COLORS="true"
@@ -78,6 +76,9 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+# Add llama app CLI
+export PATH="$PATH:$HOME/.llama-app"
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -93,14 +94,6 @@ source $ZSH/oh-my-zsh.sh
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
 
-# Load custom aliases
-# Modern XDG-compliant location
-if [[ -f "$HOME/.config/zsh/aliases.zsh" ]]; then
-    source "$HOME/.config/zsh/aliases.zsh"
-fi
-
-# Legacy bash aliases removed - using modern zsh aliases instead
-
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
 # users are encouraged to define aliases within a top-level file in
@@ -112,95 +105,8 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
-
-# Add homebrew completions if on macOS
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    fpath+=/opt/homebrew/share/zsh/site-functions
-fi
-
-# Smarter completion initialization
-autoload -Uz compinit
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS version with BSD stat
-    if [ "$(date +'%j')" != "$(stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)" ]; then
-        compinit
-    else
-        compinit -C
-    fi
-else
-    # Linux version with GNU stat
-    if [ "$(date +'%j')" != "$(stat -c '%Y' ~/.zcompdump 2>/dev/null | date -d @- +'%j' 2>/dev/null)" ]; then
-        compinit
-    else
-        compinit -C
-    fi
-fi
-
-eval "$(starship init zsh)"
-
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-
-# >>> mamba initialize >>>
-# !! Contents within this block are managed by 'mamba shell init' !!
-# Platform-agnostic mamba setup
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS paths
-    export MAMBA_EXE="$HOME/miniforge3/bin/mamba"
-    export MAMBA_ROOT_PREFIX="$HOME/miniforge3"
-else
-    # Linux paths
-    export MAMBA_EXE="$HOME/miniconda3/bin/mamba"
-    export MAMBA_ROOT_PREFIX="$HOME/miniconda3"
-fi
-
-if [ -f "$MAMBA_EXE" ]; then
-    __mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
-    if [ $? -eq 0 ]; then
-        eval "$__mamba_setup"
-    else
-        alias mamba="$MAMBA_EXE"  # Fallback on help from mamba activate
-    fi
-    unset __mamba_setup
-fi
-# <<< mamba initialize <<<
-
-
-# bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-# bob
-export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
-#
-#zprof
-
-
-if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
-  export PATH=/opt/homebrew/opt/ruby/bin:$PATH
-  export PATH=`gem environment gemdir`/bin:$PATH
-fi
-
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/bolster/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
 # End of Docker CLI completions
-
-# Claude Code MCP Environment Variables
-# Get your Tavily API key from: https://app.tavily.com/home
-export TAVILY_API_KEY="${TAVILY_API_KEY}"
-
-# Note: Other MCP environment variables like VANTAGE are configured via OAuth in the MCP servers
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/bolster/.lmstudio/bin"
-# End of LM Studio CLI section

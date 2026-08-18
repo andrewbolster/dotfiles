@@ -17,6 +17,16 @@ This configuration uses a hierarchical agent structure:
 - **development-environment.md**: Technical environment details and helper tools (markitdown, lsof patterns, etc.)
 - **quality-standards.md**: Data verification and content standards
 
+## Repository Layout Convention
+
+All git repositories live under `~/src/<org>/<repo>`:
+
+- GitHub orgs: `SIG-Innovation-Zone`, `bd-vitalstatistix`, `Synopsys-SIG-RnD`, `bd-core-svcs`, `bd-internal`, `blackducksoftware`, `andrewbolster`
+- GitLab: `sigma` (under `~/src/sigma/sigma`)
+- No flat `~/src/<repo>` paths — always `~/src/<org>/<repo>`
+
+When referencing or navigating to a repo, always use the full `~/src/<org>/<repo>` form. If a path like `~/src/service-llm` is seen anywhere, it is stale — the correct path is `~/src/SIG-Innovation-Zone/service-llm`.
+
 ## Python Script Execution — CRITICAL
 
 **Always use `uv run` to execute Python scripts, never bare `python` or `python3`.**
@@ -159,7 +169,7 @@ When a check comes back complete (pass or fail), act on the result immediately �
 **Required actions**:
 1. Read `/Users/bolster/.claude/shared/infrastructure-management.md`
 2. Read `/Users/bolster/.claude/shared/professional-context.md`
-3. Work from `/Users/bolster/src/service-llm/` using `scripts/manage.py` or `make` targets
+3. Work from `/Users/bolster/src/SIG-Innovation-Zone/service-llm/` using `scripts/manage.py` or `make` targets
 4. Reference Confluence documentation links (do not reproduce content inline)
 
 ### Multi-Domain Tasks
@@ -205,6 +215,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 This ensures accurate attribution across all projects and different Claude models.
 
+## Search and Filesystem Rules
+
+- **Never run `find ~` or `find /` blindly** — scanning the home directory or filesystem root is slow, triggers security alerts, and is never necessary. Always scope `find` to a specific subdirectory (e.g. `find ~/.claude/`, `find ~/src/bd-vitalstatistix/`).
+
 ## Behavioural Rules (from project memory)
 
 - **Delegate verbose CI commands to subagents**: `gh run view --log`, `gh run view` with log output, and any `gh` command that streams CI logs produce hundreds of lines of runner noise. Delegate these to a subagent with a targeted question rather than piping the full log into the main context.
@@ -212,3 +226,5 @@ This ensures accurate attribution across all projects and different Claude model
 - **Never edit files directly via the GitHub API**: Always clone (or pull) the repo locally, edit with Edit/Write tools, commit, then push. Never use `gh api repos/.../contents/...` PUT to modify files remotely — it bypasses local review and pre-commit hooks.
 
 - **Never use `gh pr merge --admin`**: This bypasses branch protection rules and required status checks. It must never be used, even when CI failures appear to be environmental/flaky rather than code-related. The correct approach is to investigate and fix the root cause, retry the failing jobs, or explicitly ask the user to decide whether to override. The user's repo rules exist for a reason.
+
+- **Never merge without explicit approval**: Do not merge PRs — by any method — unless the user has explicitly asked for the merge in that message. Presenting a PR as "ready" is not permission to merge it. Never perform any `--admin` git or GitHub actions.

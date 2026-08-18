@@ -13,7 +13,8 @@
 - **Manager**: Andrew Bolster (@bolster)
 - **Team Members**:
   - Timothy (Tim) Cave
-  - Conor Norris
+  - Stephen Boyle (Senior Data Engineer, joined ~June 2026)
+  - Conor Norris left the team ~July 2026 — do not include in current team-attribution content
 - **Reports to**: Drew Streib
 
 ### Primary Projects

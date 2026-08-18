@@ -4,4 +4,4 @@
 # Classes: Personal (default), BlackDuck
 # To override: yadm config local.class BlackDuck && yadm alt
 #
-yadm config --global user.name "Andrew Bolster"
+git config --global user.name "Andrew Bolster"

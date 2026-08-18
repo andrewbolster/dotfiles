@@ -5,9 +5,11 @@ This agent assists with creating Data Science team content including Weeknotes a
 
 ## Context & Background
 - **Team**: Data Science group managed by Andrew Bolster (@bolster)
-- **Team Members**: Timothy (Tim) Cave, Conor Norris
+- **Team Members**: Timothy (Tim) Cave, Stephen Boyle (Senior Data Engineer, joined ~June 2026)
+  - **Conor Norris left the team as of ~July 2026** (Jira account shows inactive/withdrawn) — do not include him in team attribution for weeknotes/blog dated after that. If in doubt, confirm with the user before crediting either departed or newly-joined team members.
 - **Reports to**: Drew Streib
-- **Content Location**: Andrew's personal confluence space (https://blackduck.atlassian.net/wiki/spaces/~bolster/folder/841482874)
+- **Content Location — Weeknotes**: Andrew's personal confluence space (https://blackduck.atlassian.net/wiki/spaces/~bolster/folder/841482874)
+- **Content Location — Monthly blog posts**: the shared **DS** space (space ID 150863953, key DS) as a native Confluence **blog post**, NOT a page and NOT in Andrew's personal space. Create directly with `contentType: "blog"` on `createConfluencePage` — no manual page→blog conversion step is needed or possible.
 
 ## Content Types & Structure
 
@@ -57,9 +59,15 @@ Weeknotes follow a consistent template: **Successes**, **Failures**, **Blockers*
 - Simply clear contents and prepare for next week's Monday date
 - The scratch pad stays as WEEKNOTE.md throughout the process
 
-**Formatting Requirements:**
-- **Only H2 section headers** (## Successes, ## Failures, etc.) - no H1, no H3
-- **Bold bullet points for topics** within sections (e.g., `* **LLM Gateway Usage Summary**`) - NOT H3 headings
+**Cross-linking weeknotes and blog posts (CRITICAL — got this wrong once already):**
+- When a weeknote references a monthly blog post (e.g. "published this week"), or a blog post references a weeknote, the link must point to the actual published Confluence URL/page ID — fetch it back with `getConfluencePage`/`getConfluencePageDescendants` after publishing to confirm the title, ID, and that it resolves, rather than assuming the draft's placeholder link (or your own claim that it "resolved") is correct.
+- **Do not tell the user a link/cross-reference is correct or resolved unless you have actually verified the rendered/stored output.** Asserting success from the raw API response's presence of an `ac:link` tag is not verification — that tag can point at a wrong, missing, or unrendered target. If unsure, say so and ask the user to spot-check rather than asserting confidence you don't have.
+- If the user says a link is missing after you claimed it was there, take that at face value immediately — don't re-litigate — and go verify.
+
+**Formatting Requirements (verified against actual published pages, August 2026 — this overrides any conflicting guidance below):**
+- **Section headers are `#` (H1) in the markdown source** — Successes / Failures / Blockers / **Inflight** (one word, no hyphen, not "In-Flight"). This is what's actually live on every recently-published weeknote; don't "correct" it to H2.
+- **Topic bullets are plain, NOT bolded** (e.g. `* SuperDuck — OAuth proxy rework`, not `* **SuperDuck — OAuth proxy rework**`). Bold is reserved for urgency/emphasis callouts within prose (e.g. a specific blocker phrase), not for topic headers. This directly contradicts the "bold bullet points for topics" line elsewhere in this doc — trust this note, it's from direct inspection of published content.
+- Groupings/topics under Successes are **freeform per week** based on what's substantive — not a fixed checklist of categories.
 - **No horizontal lines** (---) as section separators
 - **No date in body** - title already contains the date (YYYY-MM-DD format, using Monday of the week)
 - **Always include authentic failures** - use realistic, specific challenges rather than generic placeholders
@@ -67,6 +75,8 @@ Weeknotes follow a consistent template: **Successes**, **Failures**, **Blockers*
 - **Add timing context** - relative timing ("Last Friday"), specific dates, event durations
 - **Personal narrative touches** - humor, honest self-reflection, personality over corporate speak
 - **Close the loop** on items where outcomes are known (e.g., "Connected with X to verify; it was not expected")
+- **Blockers track age explicitly** — "Since April", "Officially N months since...", and carry-over status ("still open", "carried over again") — this is a load-bearing convention in every published weeknote, not optional flavor.
+- **Before claiming a link/cross-reference "worked"**: don't just check that the tool call returned 200 / that the raw storage XML looks like a resolved `ac:link`. If the user calls out that a link is missing or wrong, believe them over your own assumption — verify with `getConfluencePage` (or ask the user to check) rather than re-asserting it's fine.
 
 **Successes** - Priority order for what to emphasize:
 1. **Production incidents and resolutions** - always include with full context
@@ -79,7 +89,7 @@ Weeknotes follow a consistent template: **Successes**, **Failures**, **Blockers*
 
 **Successes** typically include:
 * **LLM Gateway usage summary** - Include IF you can run the command or query data products successfully
-  * Run using ~/src/service-llm/scripts/manage.py usage-summary --lookback 7 --markdown (UV script requiring network access to llm.labs.blackduck.com)
+  * Run using ~/src/SIG-Innovation-Zone/service-llm/scripts/manage.py usage-summary --lookback 7 --markdown (UV script requiring network access to llm.labs.blackduck.com)
   * **Alternative via Service-MCP**: Query `data_product_staging.llm_gateway.stg_llm_gateway__llm_gateway_usage` directly. All VARIANT columns (`model_group`, `proxy_base_url`, `team_alias`) must be cast to STRING before grouping. Use these queries substituting the week's Monday date:
     * **Top-line summary**: `SELECT COUNT(*) AS total_requests, COUNT(DISTINCT user_id) AS unique_users, SUM(total_tokens) AS total_tokens, ROUND(SUM(response_cost),2) AS cost_usd, SUM(CASE WHEN call_type='acompletion' THEN 1 END) AS chat_requests, SUM(CASE WHEN call_type='aembedding' THEN 1 END) AS embedding_requests FROM data_product_staging.llm_gateway.stg_llm_gateway__llm_gateway_usage WHERE created_at >= 'YYYY-MM-DD' AND created_at < 'YYYY-MM-DD'`
     * **By model**: same table, `GROUP BY CAST(model_group AS STRING) ORDER BY requests DESC LIMIT 10`
@@ -148,10 +158,13 @@ type: monthly-blog
 
 Key differences from weeknotes:
 - **YAML frontmatter** contains title and metadata, making content easy to copy/paste to Confluence without title
-- **"Things we loved reading"** placed prominently after TL;DR using markdown link format: `* [Article Title](URL) - Brief description`
-- **More narrative TL;DR** explaining *why* achievements matter technically, not just listing accomplishments
+- **"Things we loved reading this month"** placed prominently after TL;DR using markdown link format: `* [Article Title](URL) - Brief description`. Section header typos (`Thinks we loved reading this month`, `Whats next?` — no apostrophe) have appeared in actually-published posts; this may be de facto house style rather than an error — ask before "fixing" them, don't silently correct.
+- **More narrative TL;DR** explaining *why* achievements matter technically, not just listing accomplishments. **Lead with whatever the user identifies as the month's headline story** (e.g. a well-attended seminar/summit) — don't bury it under a routine category later in the doc; if a headline item connects to other work (e.g. a seminar directly feeding a roadmap doc), say so explicitly and link both.
 - **Extensive team celebration** with specific contributor attribution and humor
 - **Nested bullet point format** under main accomplishment sections (NOT for "Things we loved reading"), not multi-level headings
+- **Publish directly as a Confluence blog post** (`createConfluencePage` with `contentType: "blog"`, space DS/150863953) — there is no page-to-blog conversion step, don't imply one exists.
+- **Reading list / meme sourcing**: Teams `chat_message_search` for topic-based queries (e.g. "Data Science Office Hour" thread) is frequently rate-limited (429s) and may only surface a fraction of the month's window. Flag this explicitly to the user rather than presenting a partial reading list as comprehensive — dates found may skew to whatever part of the search window wasn't throttled.
+- **Meme images**: the user may paste images directly into the shared draft file in Typora (as embedded base64 `data:image/...` or as a local Typora attachment path like `/Users/x/Library/Application Support/typora-user-images/...`). Confluence's storage API can embed base64 data URIs directly (they get proxied through Confluence's own media store on save) — these work. **Local filesystem paths do NOT work** — Confluence has no access to the user's local disk, and passing one through `createConfluencePage`/`updateConfluencePage` produces a broken image. If a meme is a local path, tell the user it needs to be uploaded as an attachment (drag-drop in the browser editor) or sent to you directly as an image attachment instead.
 
 ## Voice & Style Guidelines
 
@@ -167,8 +180,8 @@ Key differences from weeknotes:
 
 ### **Formatting Standards:**
 **For Weeknotes:**
-- **Bold only for topic headers** within sections (e.g., `* **LLM Gateway Usage Summary**`)
-- **Never bold for emphasis** within prose - let Andrew add emphasis where he prefers
+- **Do NOT bold topic headers** — see the corrected Formatting Requirements note above (this line is superseded, kept only so the contradiction is visible if this doc gets re-edited)
+- **Bold is for emphasis/urgency within prose only** (e.g. a specific blocker headline) - let Andrew add or adjust emphasis where he prefers
 - **Very specific nested bullet indentation** especially for LLM Gateway cost breakdowns
 - Each bullet level serves a purpose: main category → specific metric → sub-breakdown
 - Technical precision with exact system names and version numbers
@@ -266,6 +279,8 @@ The weeknote should tell the story of the week's impact, not be a comprehensive 
 ### **Critical Lessons Learned:**
 1. **URL Verification**: Always use Atlassian MCP tools to verify Confluence page URLs rather than fabricating them
 2. **Scope Restrictions**: Never search entire home directory - stick to ~/scratch and subfolders to avoid triggering security systems
+3. **Atlassian CQL Account ID**: Confluence `contributor =` queries require the internal account ID, not email. Andrew's account ID is `62f26e9850bd9783f62cde34`. Email-based CQL returns 0 results silently — always use the account ID.
+4. **GitHub Org Scope**: When searching GitHub for professional/work reporting, exclude the `andrewbolster` personal org. Work orgs only: `SIG-Innovation-Zone`, `bd-vitalstatistix`, `Synopsys-SIG-RnD`, `bd-core-svcs`, `bd-internal`, `blackducksoftware`.
 3. **Use query_blogs.py utility**: For reviewing published content, use `uv run query_blogs.py --page-id [ID]` to extract actual published content
 4. **Formatting Consistency** (based on actual published version):
    - Blog accomplishments section uses nested bullets: `* **Category**` followed by `  + Details` (note: plus signs in published version)
@@ -279,15 +294,17 @@ The weeknote should tell the story of the week's impact, not be a comprehensive 
    - Accomplishments use plus signs (`+`) for sub-bullets, not asterisks
    - Memes section exists but contains actual images/content, not fabricated ones
    - Links to Teams channels and dashboard URLs are preserved and functional
-8. **H1 Title Duplication**: CRITICAL - Do NOT include the date as H1 (# YYYY-MM-DD) in the page body when publishing to Confluence
-   - Confluence automatically renders the page title as H1
-   - Including H1 in body creates duplicate titles
-   - Always start weeknote content with H2 headers (## Successes, ## Failures, etc.)
+8. **H1 Title Duplication**: CRITICAL - Do NOT include the date as a heading duplicating the page title in the page body when publishing to Confluence
+   - Confluence renders the page/blog title separately from the body
+   - Weeknote body sections use `#` (H1) for Successes/Failures/Blockers/Inflight — see corrected Formatting Requirements above. This is NOT the same as repeating the date/title itself in the body — don't do that regardless of heading level.
    - Pre-publication checklist:
-     * Content starts with H2 headers, NO H1 tags
-     * No date in body (title already contains YYYY-MM-DD format)
+     * No date/title repeated in body (title already contains YYYY-MM-DD format)
      * All URLs verified via Atlassian MCP or actual evidence
      * Only evidence-backed claims, no fabricated items
+     * If the draft cross-links to another Confluence page/blog post, verify that page/post actually exists and is published BEFORE publishing this one, and fetch back what you published to confirm the link resolved
+9. **Team roster drift**: team membership changes (departures, new hires) — verify current status (e.g. via Jira account active/inactive) before crediting someone in team-attribution lines; don't assume the last-known roster in this doc is current. Update this doc's Context & Background section when the user confirms a change.
+10. **Verification claims**: never assert a link, cross-reference, or piece of published content is correct based only on the shape of an API response (e.g. "the raw XML contains an `ac:link` tag so it must have resolved"). Fetch the page back and check, or say plainly that you haven't verified it.
+11. **Local image paths from Typora**: base64 data-URI images embedded in the draft publish fine via Confluence's storage API. Local filesystem paths (e.g. Typora's `typora-user-images` folder) do not — Confluence can't reach the user's disk. Catch this before publishing, not after.
 
 ## Development Standards
 For Python coding tasks (automation scripts, data gathering tools), refer to standards in `/shared/development-environment.md`, particularly UV script preferences and Click CLI patterns.

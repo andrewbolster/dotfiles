@@ -50,50 +50,30 @@
   "alwaysThinkingEnabled": false,
   "autoUpdatesChannel": "stable",
   "skipDangerousModePermissionPrompt": true,
+  "theme": "auto",
   "verbose": true,
   "mcpServers": {
-    "memory": {
+    "work-iq": {
+      "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-memory"
-      ]
-    },
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "%HOME%"
-      ]
-    },
-    "ddg-search": {
-      "command": "uvx",
-      "args": [
-        "duckduckgo-mcp-server"
-      ],
-      "env": {
-        "DDG_SAFE_SEARCH": "OFF"
-      }
-    },
-    "bolster": {
-      "type": "http",
-      "url": "https://mcp.bolster.online/mcp/"
-    },
-    "service-mcp": {
-      "type": "http",
-      "url": "https://service-mcp-app.nicefield-9cf5f7f2.eastus.azurecontainerapps.io/mcp/",
-      "headers": {
-        "Authorization": "Bearer ${MCP_STATIC_ACCESS_TOKEN}"
-      }
+      "args": ["-y", "@microsoft/workiq@latest", "mcp"]
     },
     "atlassian": {
       "type": "http",
       "url": "https://mcp.atlassian.com/v1/mcp"
     },
+    "superduck": {
+      "type": "http",
+      "url": "https://service-mcp-app.nicefield-9cf5f7f2.eastus.azurecontainerapps.io/mcp/"
+    },
+    "bolster": {
+      "type": "http",
+      "url": "https://mcp.bolster.online/mcp/"
+    },
     "vantage": {
       "type": "sse",
       "url": "https://mcp.vantage.sh/sse"
     }
-  }
+  },
+  "skipWorkflowUsageWarning": true
 }

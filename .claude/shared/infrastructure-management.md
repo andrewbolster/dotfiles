@@ -31,7 +31,7 @@ Reference these pages rather than duplicating content here:
 
 ### Management Repository
 
-**Repo**: `/Users/bolster/src/service-llm/`
+**Repo**: `/Users/bolster/src/SIG-Innovation-Zone/service-llm/`
 
 All management operations go through this repo. The repo has its own Claude agents; when working in that directory, those agents auto-load.
 
@@ -83,7 +83,7 @@ make smoke              # Smoke test gateway connectivity
 
 #### Specialized Claude Agents in service-llm
 
-When working in `/Users/bolster/src/service-llm/`, these agents are available:
+When working in `/Users/bolster/src/SIG-Innovation-Zone/service-llm/`, these agents are available:
 
 - **log-analysis**: Analyze failure logs and error patterns
 - **user-management**: Handle user onboarding, budget management
@@ -103,7 +103,7 @@ Users hit the default $100/month budget and request increases.
 - Check current usage first before bumping
 
 ```bash
-cd ~/src/service-llm
+cd ~/src/SIG-Innovation-Zone/service-llm
 ./scripts/manage.py --env labs list-users  # Check current budget/usage
 ./scripts/manage.py --env labs update-budget user@blackduck.com --budget 200
 ```

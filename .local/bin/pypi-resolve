@@ -8,7 +8,7 @@ Resolve full transitive dependency tree for a list of PyPI packages.
 Outputs package==version lines suitable for a requirements lock file.
 """
 
-import sys
+from datetime import datetime, timezone, timedelta
 from graphlib import TopologicalSorter
 from packaging.requirements import Requirement
 from packaging.version import Version
@@ -16,10 +16,72 @@ from packaging.specifiers import SpecifierSet
 import click
 import requests
 
+AGE_GATE_DAYS = 7
+
 PYPI_URL = "https://pypi.org/pypi/{package}/json"
 PYPI_VERSION_URL = "https://pypi.org/pypi/{package}/{version}/json"
+ARTIFACTORY_SIMPLE_URL = "https://artifactory.tools.duckutil.net/artifactory/api/pypi/pypi-virtual/simple/{package}/"
 
 _cache: dict = {}
+
+
+def parse_blocklist(entries: tuple[str, ...]) -> dict[str, set[str] | None]:
+    """
+    Parse block entries into {normalised_name: set_of_blocked_versions | None}.
+    None means all versions of that package are blocked.
+    'jupyter-builder==1.0.2' → {'jupyter-builder': {'1.0.2'}}
+    'jupyter-builder'        → {'jupyter-builder': None}
+    """
+    def norm(name: str) -> str:
+        return name.lower().replace("_", "-")
+
+    blocked: dict[str, set[str] | None] = {}
+    for entry in entries:
+        entry = entry.strip()
+        if not entry or entry.startswith("#"):
+            continue
+        if "==" in entry:
+            name, ver = entry.split("==", 1)
+            n = norm(name.strip())
+            if blocked.get(n) is None and n in blocked:
+                pass  # all-versions block already in place
+            else:
+                blocked.setdefault(n, set())
+                if blocked[n] is not None:
+                    blocked[n].add(ver.strip())
+        else:
+            blocked[norm(entry)] = None  # block all versions
+    return blocked
+
+
+def is_blocked(package: str, version: str, blocked: dict[str, set[str] | None]) -> bool:
+    """Return True if this package==version is on the block list."""
+    entry = blocked.get(package)
+    if entry is None and package in blocked:
+        return True  # all-versions block
+    if isinstance(entry, set):
+        return version in entry
+    return False
+
+
+def check_artifactory_fn(package: str, version: str, token: str) -> bool:
+    """Return True if package==version is available in Artifactory."""
+    key = f"arty:{package}=={version}"
+    if key in _cache:
+        return _cache[key]
+    url = ARTIFACTORY_SIMPLE_URL.format(package=package.lower().replace("_", "-"))
+    try:
+        r = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=10)
+        if r.status_code == 404:
+            _cache[key] = False
+            return False
+        r.raise_for_status()
+        present = version in r.text
+        _cache[key] = present
+        return present
+    except Exception:
+        _cache[key] = False
+        return False
 
 
 def fetch_package_info(package: str, version: str | None = None) -> dict | None:
@@ -38,21 +100,52 @@ def fetch_package_info(package: str, version: str | None = None) -> dict | None:
         return None
 
 
-def resolve_version(package: str, specifier_str: str = "") -> str | None:
-    """Pick the latest version of package satisfying specifier_str."""
+def resolve_version(
+    package: str,
+    specifier_str: str = "",
+    age_gate_days: int = 0,
+    blocked: dict[str, set[str] | None] | None = None,
+) -> str | None:
+    """Pick the latest version satisfying specifier, age gate, and block list."""
     data = fetch_package_info(package)
     if not data:
         return None
     spec = SpecifierSet(specifier_str)
     releases = data.get("releases", {})
-    candidates = sorted(
-        (Version(v) for v in releases if not Version(v).is_prerelease),
-        reverse=True,
-    )
+    threshold = datetime.now(timezone.utc) - timedelta(days=age_gate_days) if age_gate_days else None
+    blocked = blocked or {}
+
+    def norm(name: str) -> str:
+        return name.lower().replace("_", "-")
+
+    pkg_norm = norm(package)
+
+    candidates = []
+    for v, files in releases.items():
+        try:
+            parsed = Version(v)
+        except Exception:
+            continue
+        if parsed.is_prerelease:
+            continue
+        if is_blocked(pkg_norm, str(parsed), blocked):
+            continue
+        if threshold and files:
+            try:
+                upload = min(
+                    datetime.fromisoformat(f["upload_time"]).replace(tzinfo=timezone.utc)
+                    for f in files
+                )
+                if upload.date() >= threshold.date():
+                    continue  # too new — skip (day-boundary)
+            except Exception:
+                pass
+        candidates.append(parsed)
+
+    candidates.sort(reverse=True)
     for v in candidates:
         if v in spec:
             return str(v)
-    # If nothing matches the spec, fall back to latest
     if candidates:
         return str(candidates[0])
     return None
@@ -68,10 +161,8 @@ def get_requires_dist(package: str, version: str) -> list[str]:
     result = []
     for req_str in requires:
         req = Requirement(req_str)
-        # Skip optional/extra deps
         if req.extras:
             continue
-        # Skip deps with markers that won't apply to a generic Python 3.11+ env
         if req.marker:
             try:
                 if not req.marker.evaluate({"extra": "", "python_version": "3.11"}):
@@ -85,6 +176,8 @@ def get_requires_dist(package: str, version: str) -> list[str]:
 def build_graph(
     roots: list[tuple[str, str]],
     verbose: bool,
+    age_gate_days: int = 0,
+    blocked: dict[str, set[str] | None] | None = None,
 ) -> tuple[dict[str, str], dict[str, set[str]]]:
     """
     BFS over the dependency graph.
@@ -92,6 +185,8 @@ def build_graph(
       resolved: {normalised_name: version}
       graph:    {normalised_name: {dep_name, ...}}
     """
+    blocked = blocked or {}
+
     def norm(name: str) -> str:
         return name.lower().replace("_", "-")
 
@@ -101,9 +196,9 @@ def build_graph(
 
     for name, spec in roots:
         n = norm(name)
-        ver = resolve_version(name, spec)
+        ver = resolve_version(name, spec, age_gate_days, blocked)
         if ver is None:
-            click.echo(f"  error: could not resolve {name}{spec}", err=True)
+            click.echo(f"  error: could not resolve {name}{spec} (blocked/age-gated — no satisfying version)", err=True)
             continue
         if verbose:
             click.echo(f"  root  {n}=={ver}", err=True)
@@ -120,7 +215,7 @@ def build_graph(
             graph[pkg].add(dep)
             if dep in resolved:
                 continue
-            dep_ver = resolve_version(req.name, str(req.specifier))
+            dep_ver = resolve_version(req.name, str(req.specifier), age_gate_days, blocked)
             if dep_ver is None:
                 click.echo(f"  warning: could not resolve dep {dep} (required by {pkg})", err=True)
                 continue
@@ -135,16 +230,13 @@ def build_graph(
 
 def topological_sort(resolved: dict[str, str], graph: dict[str, set[str]]) -> list[str]:
     """Return packages in install order (dependencies before dependents)."""
-    # Restrict graph edges to packages we actually resolved
     clean_graph = {
         pkg: {dep for dep in deps if dep in resolved}
         for pkg, deps in graph.items()
         if pkg in resolved
     }
-    # Add any resolved packages with no recorded edges
     for pkg in resolved:
         clean_graph.setdefault(pkg, set())
-
     ts = TopologicalSorter(clean_graph)
     return list(ts.static_order())
 
@@ -153,7 +245,20 @@ def topological_sort(resolved: dict[str, str], graph: dict[str, set[str]]) -> li
 @click.argument("packages", nargs=-1, required=True)
 @click.option("--verbose", "-v", is_flag=True, help="Show resolution progress on stderr")
 @click.option("--output", "-o", type=click.Path(), default=None, help="Write output to file instead of stdout")
-def main(packages: tuple[str, ...], verbose: bool, output: str | None):
+@click.option("--check-artifactory", "-a", is_flag=True, help="Filter out packages already present in Artifactory")
+@click.option("--artifactory-token", envvar="ARTIFACTORY_TOKEN", default=None,
+              help="Artifactory identity token (default: $ARTIFACTORY_TOKEN)")
+@click.option("--check-age", "-g", is_flag=True, help=f"Enforce age gate: skip versions uploaded within the last N days")
+@click.option("--age-days", default=AGE_GATE_DAYS, show_default=True, help="Age gate threshold in days")
+@click.option("--block", "-b", multiple=True, metavar="PKG[==VER]",
+              help="Block a package version (or all versions) from resolution. Repeatable. "
+                   "e.g. -b jupyter-builder==1.0.2  or  -b jupyter-builder")
+@click.option("--block-file", type=click.Path(exists=True), default=None,
+              help="File of block entries (one per line, same format as --block, # comments ok)")
+def main(packages: tuple[str, ...], verbose: bool, output: str | None,
+         check_artifactory: bool, artifactory_token: str | None,
+         check_age: bool, age_days: int,
+         block: tuple[str, ...], block_file: str | None):
     """
     Resolve the full transitive dependency tree for PACKAGES and print
     a sorted package==version list.
@@ -161,21 +266,94 @@ def main(packages: tuple[str, ...], verbose: bool, output: str | None):
     PACKAGES may be bare names (requests) or pinned/constrained
     (requests>=2.28, 'numpy==1.26.0').
 
+    With -a/--check-artifactory, outputs only packages NOT yet in Artifactory.
+    With -g/--check-age, skips versions uploaded within the age gate window
+    so the resolver steps down to an older safe version.
+    With -b/--block, skips specific versions (or whole packages) during
+    resolution — use for known-vulnerable versions.
+
     Example:
         pypi-resolve prophet
         pypi-resolve 'fastapi>=0.100' pydantic uvicorn
+        pypi-resolve -a prophet numpy
+        pypi-resolve -g prophet
+        pypi-resolve -a -g -b jupyter-builder==1.0.2 prophet numpy
+        pypi-resolve -g -a --block-file ~/src/blocked-packages.txt $(cat requirements.txt)
     """
+    if check_artifactory and not artifactory_token:
+        raise click.UsageError("--check-artifactory requires $ARTIFACTORY_TOKEN or --artifactory-token")
+
+    # Build block list from --block flags and optional file
+    all_block_entries = list(block)
+    if block_file:
+        with open(block_file) as f:
+            all_block_entries.extend(f.readlines())
+    blocked = parse_blocklist(tuple(all_block_entries))
+    if blocked and verbose:
+        for pkg, vers in blocked.items():
+            label = "all versions" if vers is None else ", ".join(sorted(vers))
+            click.echo(f"  blocked  {pkg}  ({label})", err=True)
+
     roots: list[tuple[str, str]] = []
     for p in packages:
         req = Requirement(p)
         roots.append((req.name, str(req.specifier)))
 
-    click.echo(f"Resolving {len(roots)} root package(s)...", err=True)
-    resolved, graph = build_graph(roots, verbose)
+    effective_age_days = age_days if check_age else 0
+    flags = []
+    if effective_age_days:
+        flags.append(f"age gate: {effective_age_days}d")
+    if blocked:
+        flags.append(f"blocked: {len(blocked)} package(s)")
+    flag_str = f" ({', '.join(flags)})" if flags else ""
+    click.echo(f"Resolving {len(roots)} root package(s){flag_str}...", err=True)
+
+    resolved, graph = build_graph(roots, verbose, effective_age_days, blocked)
     click.echo(f"Resolved {len(resolved)} packages total.", err=True)
 
+    # Warn if any blocked package still appears (e.g. all versions blocked, resolver fell through)
+    for pkg, vers in blocked.items():
+        if pkg in resolved:
+            r_ver = resolved[pkg]
+            if vers is None or r_ver in vers:
+                click.echo(f"  BLOCKED package still resolved: {pkg}=={r_ver} — remove from output", err=True)
+
     ordered = topological_sort(resolved, graph)
-    lines = [f"{pkg}=={resolved[pkg]}" for pkg in ordered if pkg in resolved]
+    lines = []
+    counts = {"ok": 0, "missing": 0}
+
+    for pkg in ordered:
+        if pkg not in resolved:
+            continue
+        ver = resolved[pkg]
+        pinned = f"{pkg}=={ver}"
+
+        # Silently drop any blocked package that leaked through
+        if is_blocked(pkg, ver, blocked):
+            click.echo(f"  BLOCKED   {pinned}  (dropped from output)", err=True)
+            continue
+
+        in_arty = check_artifactory_fn(pkg, ver, artifactory_token) if check_artifactory else None
+
+        if check_artifactory and not in_arty:
+            counts["missing"] += 1
+            if verbose:
+                click.echo(f"  MISSING   {pinned}", err=True)
+            lines.append(pinned)
+        else:
+            counts["ok"] += 1
+            if verbose:
+                click.echo(f"  ok        {pinned}", err=True)
+
+    if not check_artifactory:
+        lines = [
+            f"{pkg}=={resolved[pkg]}"
+            for pkg in ordered
+            if pkg in resolved and not is_blocked(pkg, resolved[pkg], blocked)
+        ]
+
+    if check_artifactory:
+        click.echo(f"{counts['ok']} in Artifactory, {counts['missing']} missing.", err=True)
 
     out = "\n".join(lines) + "\n"
     if output:
