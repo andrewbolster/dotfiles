@@ -11,7 +11,7 @@ yadm submodule update --recursive --init
 # execute all executable files (excluding templates and editor backups) in the
 # ~/.config/yadm/bootstrap.d directory when run.
 
-set -eu
+set -u
 
 # Directory to look for bootstrap executables in
 BOOTSTRAP_D="${BASH_SOURCE[0]}.d"
@@ -21,13 +21,42 @@ if [[ ! -d "$BOOTSTRAP_D" ]]; then
     exit 1
 fi
 
-find -L "$BOOTSTRAP_D" -type f | sort | while IFS= read -r bootstrap; do
-    echo "Starting '$bootstrap'"
-    if [[ -x "$bootstrap" && ! "$bootstrap" =~ "##" && ! "$bootstrap" =~ "~$" ]]; then
-        if ! "$bootstrap"; then
-            echo "Error: bootstrap '$bootstrap' failed" >&2
-            exit 1
-        fi
-    fi
-done
+# Collect failures rather than aborting, so one bad script does not
+# prevent the rest from running. Report a summary at the end.
+FAILED=()
+RAN=0
+SKIPPED=0
 
+# Process substitution (not a pipe) so counters survive: a piped while
+# loop runs in a subshell and its variable updates are lost.
+while IFS= read -r bootstrap; do
+    if [[ -x "$bootstrap" && ! "$bootstrap" =~ "##" && ! "$bootstrap" =~ "~$" ]]; then
+        echo ""
+        echo "==> Starting '$bootstrap'"
+        RAN=$((RAN + 1))
+        if ! "$bootstrap"; then
+            status=$?
+            echo "!!! bootstrap '$bootstrap' failed (exit $status)" >&2
+            FAILED+=("$bootstrap")
+        fi
+    else
+        SKIPPED=$((SKIPPED + 1))
+    fi
+done < <(find -L "$BOOTSTRAP_D" -type f | sort)
+
+echo ""
+echo "========================================"
+echo "Bootstrap summary: $RAN run, ${#FAILED[@]} failed, $SKIPPED skipped"
+echo "========================================"
+
+if [[ ${#FAILED[@]} -gt 0 ]]; then
+    echo "Failed scripts:" >&2
+    for f in "${FAILED[@]}"; do
+        echo "  - $f" >&2
+    done
+    echo "" >&2
+    echo "Re-run an individual script to see its full output." >&2
+    exit 1
+fi
+
+echo "All bootstrap scripts completed successfully."
