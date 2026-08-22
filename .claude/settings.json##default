@@ -27,6 +27,7 @@
   "effortLevel": "medium",
   "skipDangerousModePermissionPrompt": true,
   "verbose": true,
+  "agentPushNotifEnabled": true,
   "mcpServers": {
     "memory": {
       "command": "npx",
